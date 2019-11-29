@@ -125,10 +125,4 @@ public class Database {
                                 c.name, StandardCharsets.UTF_8),
                         c -> c.id));
     }
-
-    public void resetCount() {
-    }
-
-    public void shuffleLists() {
-    }
 }
