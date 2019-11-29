@@ -115,7 +115,7 @@ public class ServerSideGame extends Thread {
     }
 
     private void choosingCategory() throws IOException {
-        currentPlayer.outputObject.writeObject("Choose category :");
+        currentPlayer.sendMessage(ServerMessage.Headers.CHOOSE_CATEGORY, db.getCategoryString());
         String category = currentPlayer.input.readLine();
         selectCategory(category);
     }

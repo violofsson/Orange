@@ -1,7 +1,6 @@
 package violofsson.orange.server;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import violofsson.orange.protocol.Question;
 
 import java.io.IOException;
@@ -120,5 +119,9 @@ public class Database {
                 .collect(Collectors.toMap(
                         c -> URLDecoder.decode(c.name, StandardCharsets.UTF_8),
                         c -> c.id));
+    }
+
+    String getCategoryString() {
+        return String.join(";", getRandomCategories(4));
     }
 }

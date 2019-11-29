@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -21,7 +22,7 @@ public class Client extends JFrame implements Runnable {
     private ObjectInputStream in;
     private PrintWriter pw;
     private final String[] colors = {"Candy", "Egg", "Famous", "Random"};
-    private JComboBox categoryChooser;
+    private JComboBox<String> categoryChooser;
     private JPanel p = new JPanel();
     private JTextArea label = new JTextArea();
 
@@ -36,7 +37,6 @@ public class Client extends JFrame implements Runnable {
     private JPanel panelRight = new JPanel();
     private JPanel centerPanel = new JPanel(new BorderLayout());
     private Thread thread = new Thread(this);
-    int counter;
 
     private Function<String, Boolean> checkAnswer;
 
@@ -180,9 +180,15 @@ public class Client extends JFrame implements Runnable {
             categorybutton.setEnabled(false);
             label.setText("\n\n\n\n\n\n\n                    " + fromServer.MESSAGE);
         } else if (fromServer.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
+            String[] categories = fromServer.MESSAGE.split(";");
+            System.out.println(Arrays.toString(categories));
+            categoryChooser.removeAllItems();
+            for (String s : categories) {
+                categoryChooser.addItem(s);
+            }
             categorybutton.setEnabled(true);
             categoryChooser.setEnabled(true);
-            label.setText("\n\n\n\n\n\n                     " + fromServer.MESSAGE);
+            label.setText("\n\n\n\n\n\n                     " + "Choose category");
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_WIN) {
             JOptionPane.showMessageDialog(this, "YOU WIN", "Congratulations",
                     JOptionPane.INFORMATION_MESSAGE);
