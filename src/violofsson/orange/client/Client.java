@@ -17,10 +17,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Client extends JFrame implements Runnable {
-    private Socket socket;
-    private ObjectInputStream in;
-    private PrintWriter pw;
-    ClientSession session;
+    private ClientSession session;
     private final String[] colors = {"Candy", "Egg", "Famous", "Random"};
     private JComboBox<String> categoryChooser;
     private JPanel p = new JPanel();
