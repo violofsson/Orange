@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 // TODO Hantera nätfel och andra specialfall
 
 public class Database {
+    static class CategoryAPICall {
+        List<CategoryAPIEntry> trivia_categories;
+    }
+
     static class CategoryAPIEntry {
         int id;
         String name;
@@ -109,12 +113,10 @@ public class Database {
 
     private void loadCategories() throws IOException {
         URL categoryURL = new URL("https://opentdb.com/api_category.php");
-        List<CategoryAPIEntry> categories = deserializer.fromJson(
+        CategoryAPICall catCall = deserializer.fromJson(
                 new InputStreamReader(categoryURL.openStream()),
-                new TypeToken<List<CategoryAPIEntry>>() {
-                }.getType());
-        //categoryIDs = categories.getCategories();
-        categoryIDs = categories.stream()
+                CategoryAPICall.class);
+        categoryIDs = catCall.trivia_categories.stream()
                 .collect(Collectors.toMap(
                         c -> URLDecoder.decode(c.name, StandardCharsets.UTF_8),
                         c -> c.id));
