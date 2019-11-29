@@ -1,26 +1,26 @@
-package Server;
+package violofsson.orange.server;
 
-import Database.Database;
-import Database.DatabaseAlt;
-import question.Question;
+import violofsson.orange.protocol.Question;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ServerSideGame extends Thread {
-    private DatabaseAlt db = new DatabaseAlt();
+    private enum States {
+        SELECTING_CATEGORY,
+        ASKING_QUESTIONS,
+        SWITCH_PLAYER,
+        ALL_QUESTIONS_ANSWERED
+    }
+
+    private Database db = new Database();
     private ServerSidePlayer currentPlayer;
     private List<Question> questions;
     private int questionsPerRound;
     private int totalRounds;
     private int currentRound = 0;
-
-    private static final int SELECTING_CATEGORY = 0;
-    private static final int ASKING_QUESTIONS = 1;
-    private static final int SWITCH_PLAYER = 2;
-    private static final int ALL_QUESTIONS_ANSWERED = 3;
-    private int currentState = SELECTING_CATEGORY;
+    private States currentState = States.SELECTING_CATEGORY;
 
     ServerSideGame(int questionsPerRound, int totalRounds) {
         this.questionsPerRound = questionsPerRound;
@@ -31,17 +31,17 @@ public class ServerSideGame extends Thread {
     public void run() {
         try {
             while (true) {
-                if (currentState == SELECTING_CATEGORY) {
+                if (currentState == States.SELECTING_CATEGORY) {
                     currentPlayer.getOpponent().outputObject.writeObject("Wait until other player chooses a category!");
                     choosingCategory();
-                    currentState = ASKING_QUESTIONS;
+                    currentState = States.ASKING_QUESTIONS;
                     currentPlayer.getOpponent().outputObject.writeObject("Wait until other player answer");
-                } else if (currentState == ASKING_QUESTIONS) {
+                } else if (currentState == States.ASKING_QUESTIONS) {
                     handleQuestions();
-                    currentState = SWITCH_PLAYER;
-                } else if (currentState == SWITCH_PLAYER) {
+                    currentState = States.SWITCH_PLAYER;
+                } else if (currentState == States.SWITCH_PLAYER) {
                     switchingPlayer();
-                } else if (currentState == ALL_QUESTIONS_ANSWERED) {
+                } else if (currentState == States.ALL_QUESTIONS_ANSWERED) {
                     sendPoints();
                     sendPointsHistory();
                     hasWinner();
@@ -99,19 +99,19 @@ public class ServerSideGame extends Thread {
         Integer[] points = {getPlayerOne().totPoints, getPlayerTwo().totPoints};
         getPlayerOne().outputObject.writeObject(points);
         getPlayerTwo().outputObject.writeObject(points);
-        currentState = SELECTING_CATEGORY;
+        currentState = States.SELECTING_CATEGORY;
     }
 
     private void switchingPlayer() throws IOException {
         if (isRoundOver()) {
             System.out.println(questions.size());
-            currentState = ALL_QUESTIONS_ANSWERED;
+            currentState = States.ALL_QUESTIONS_ANSWERED;
             System.out.println(questions.size());
         } else {
             switchPlayer();
             currentPlayer.getOpponent().outputObject
                     .writeObject("Wait for the opponent");
-            currentState = ASKING_QUESTIONS;
+            currentState = States.ASKING_QUESTIONS;
         }
     }
 

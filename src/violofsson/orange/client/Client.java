@@ -1,6 +1,6 @@
-package client;
+package violofsson.orange.client;
 
-import question.Question;
+import violofsson.orange.protocol.Question;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

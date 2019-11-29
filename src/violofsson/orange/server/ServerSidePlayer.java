@@ -1,4 +1,4 @@
-package Server;
+package violofsson.orange.server;
 
 import java.io.*;
 import java.net.Socket;

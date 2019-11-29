@@ -1,4 +1,4 @@
-package Server;
+package violofsson.orange.server;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ public class Server {
         try {
             listener = new ServerSocket(56565);
         } catch (IOException e) {
-            System.err.println("Server is not working Fazli");
+            System.err.println("Server is not working");
             e.printStackTrace();
         }
 

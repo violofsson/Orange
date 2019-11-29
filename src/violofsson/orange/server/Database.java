@@ -1,7 +1,7 @@
-package Database;
+package violofsson.orange.server;
 
 import com.google.gson.Gson;
-import question.Question;
+import violofsson.orange.protocol.Question;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DatabaseAlt {
+public class Database {
     static class QuestionResponse {
         int response_code;
         List<SerializedQuestion> results;
@@ -53,7 +53,7 @@ public class DatabaseAlt {
     Gson deserializer = new Gson();
     //String apiToken;
 
-    public DatabaseAlt() {
+    public Database() {
         /*try {
             URL tokenRequestURL = new URL("https://opentdb.com/api_token.php?command=request");
             TokenResponse tr = deserializer.fromJson(
