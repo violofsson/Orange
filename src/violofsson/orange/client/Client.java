@@ -124,8 +124,10 @@ public class Client extends JFrame implements Runnable {
                     ArrayList<java.util.List> lista = (ArrayList) obj;
                     List<Integer> playerOneHistory = lista.get(0);
                     List<Integer> playerTwoHistory = lista.get(1);
-                    String playerOneText = getScoreSummary("Spelare 1", playerOneHistory);
-                    String playerTwoText = getScoreSummary("Spelare 2", playerTwoHistory);
+                    String playerOneText = getScoreSummary("Spelare 1",
+                            playerOneHistory);
+                    String playerTwoText = getScoreSummary("Spelare 2",
+                            playerTwoHistory);
                     JOptionPane.showMessageDialog(this, playerOneText + "\n\n" + playerTwoText);
                 }
             }//while
@@ -138,7 +140,7 @@ public class Client extends JFrame implements Runnable {
 
     private void showTheQuestion(Question question) {
         label.setText("\n\n\n\n\n\n             " + question.getQuestion());
-        ArrayList<String> alt = question.getAlternatives();
+        List<String> alt = question.getAlternatives();
         checkAnswer = (question::isRightAnswer);
         for (int i = 0; i < alt.size(); i++) {
             buttons[i].setEnabled(true);

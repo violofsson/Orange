@@ -3,14 +3,22 @@ package violofsson.orange.protocol;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Question implements Serializable {
     static final long serialVersionUID = 42L;
     private String question;
     private String rightAnswer;
-    public ArrayList<String> alternatives = new ArrayList<>();
+    public List<String> alternatives = new ArrayList<>();
 
-    public ArrayList<String> getAlternatives() {
+    public Question(String question, String rightAnswer, List<String> wrongAnswers) {
+        this.question = question;
+        this.rightAnswer = rightAnswer;
+        alternatives.add(rightAnswer);
+        alternatives.addAll(wrongAnswers);
+    }
+
+    public List<String> getAlternatives() {
         Collections.shuffle(alternatives);
         return alternatives;
     }

@@ -27,8 +27,7 @@ public class Database {
         List<SerializedQuestion> results;
 
         List<Question> getQuestions() {
-            return results.stream()
-                    .map(SerializedQuestion::toRealQuestion)
+            return results.stream().map(SerializedQuestion::toRealQuestion)
                     .collect(Collectors.toList());
         }
     }
@@ -40,16 +39,13 @@ public class Database {
 
         Question toRealQuestion() {
             question = URLDecoder.decode(question, StandardCharsets.UTF_8);
-            correct_answer = URLDecoder.decode(correct_answer, StandardCharsets.UTF_8);
+            correct_answer = URLDecoder.decode(correct_answer,
+                    StandardCharsets.UTF_8);
             for (int i = 0; i < incorrect_answers.size(); i++) {
-                incorrect_answers.set(i, URLDecoder.decode(incorrect_answers.get(i), StandardCharsets.UTF_8));
+                incorrect_answers.set(i, URLDecoder.decode(
+                        incorrect_answers.get(i), StandardCharsets.UTF_8));
             }
-            Question q = new Question();
-            q.setQuestion(question);
-            q.setRightAnswer(correct_answer);
-            q.alternatives.add(correct_answer);
-            q.alternatives.addAll(incorrect_answers);
-            return q;
+            return new Question(question, correct_answer, incorrect_answers);
         }
     }
 
@@ -90,10 +86,10 @@ public class Database {
         return categories.subList(0, wantedCategories);
     }
 
-    public List<Question> getQuestions(String wantedCategory, int numberOfQuestions) {
+    public List<Question> getQuestions(String wantedCategory,
+                                       int numberOfQuestions) {
         try {
-            int categoryId = categoryIDs.getOrDefault(wantedCategory,
-                    9);
+            int categoryId = categoryIDs.getOrDefault(wantedCategory, 9);
             URL questionRequest = new URL(
                     "https://opentdb.com/api.php?amount="
                             + numberOfQuestions
@@ -102,8 +98,7 @@ public class Database {
                             + "&type=multiple"
                     /*+ "&token=" + apiToken*/);
             QuestionAPICall qr = deserializer.fromJson(
-                    new InputStreamReader(
-                            questionRequest.openStream()),
+                    new InputStreamReader(questionRequest.openStream()),
                     QuestionAPICall.class);
             return qr.getQuestions();
         } catch (IOException ioe) {
@@ -121,8 +116,7 @@ public class Database {
         //categoryIDs = categories.getCategories();
         categoryIDs = categories.stream()
                 .collect(Collectors.toMap(
-                        c -> URLDecoder.decode(
-                                c.name, StandardCharsets.UTF_8),
+                        c -> URLDecoder.decode(c.name, StandardCharsets.UTF_8),
                         c -> c.id));
     }
 }

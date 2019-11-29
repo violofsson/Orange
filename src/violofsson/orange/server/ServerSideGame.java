@@ -32,10 +32,12 @@ public class ServerSideGame extends Thread {
         try {
             while (true) {
                 if (currentState == States.SELECTING_CATEGORY) {
-                    currentPlayer.getOpponent().outputObject.writeObject("Wait until other player chooses a category!");
+                    currentPlayer.getOpponent().outputObject.writeObject(
+                            "Wait until other player chooses a category!");
                     choosingCategory();
                     currentState = States.ASKING_QUESTIONS;
-                    currentPlayer.getOpponent().outputObject.writeObject("Wait until other player answer");
+                    currentPlayer.getOpponent().outputObject.writeObject(
+                            "Wait until other player answer");
                 } else if (currentState == States.ASKING_QUESTIONS) {
                     handleQuestions();
                     currentState = States.SWITCH_PLAYER;
