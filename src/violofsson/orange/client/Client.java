@@ -9,41 +9,43 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 public class Client extends JFrame implements Runnable {
     private ClientSession session;
-    private final String[] colors = {"Candy", "Egg", "Famous", "Random"};
     private JComboBox<String> categoryChooser;
     private JPanel categoryPanel = new JPanel();
     private JTextArea label = new JTextArea();
 
-    private JButton categorybutton = new JButton("Start Game");
+    private JButton categoryButton = new JButton("Start Game");
     private JButton continueButton = new JButton("Continue");
     private JButton[] buttons = new JButton[4];
     private JLabel playerOne = new JLabel("s1");
     private JLabel playerTwo = new JLabel("s2");
-    private JPanel answersPanel = new JPanel(new GridLayout(2, 2));
-    private JPanel panelLeft = new JPanel();
-    private JPanel panelRight = new JPanel();
+    private JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
+    private JPanel leftPanel = new JPanel();
+    private JPanel rightPanel = new JPanel();
     private JPanel centerPanel = new JPanel(new BorderLayout());
-    private Thread thread = new Thread(this);
 
     private Function<String, Boolean> checkAnswer;
 
     public Client() throws IOException {
         session = new ClientSession();
 
-        answersPanel.setPreferredSize(new Dimension(500, 200));
-        answersPanel.setBorder(new EmptyBorder(0, 30, 0, 0));
-        setLayout(new BorderLayout());
+        String[] colors = {"Candy", "Egg", "Famous", "Random"};
         categoryChooser = new JComboBox<>(colors);
         categoryChooser.setSelectedIndex(0);
 
+        categoryButton.addActionListener(e -> {
+            session.write(categoryChooser.getSelectedItem());
+            categoryChooser.setEnabled(false);
+            categoryButton.setEnabled(false);
+        });
+
         categoryPanel.add(categoryChooser);
-        categoryPanel.add(categorybutton);
+        categoryPanel.add(categoryButton);
+
         centerPanel.add(label, BorderLayout.CENTER);
 
         for (int i = 0; i < buttons.length; i++) {
@@ -53,28 +55,22 @@ public class Client extends JFrame implements Runnable {
             buttons[i].setEnabled(false);
             buttons[i].setBackground(Color.BLACK);
             buttons[i].setForeground(Color.WHITE);
-            answersPanel.add(buttons[i]);
+            buttonPanel.add(buttons[i]);
         }
 
-        categorybutton.addActionListener(e -> {
-            session.write(categoryChooser.getSelectedItem());
-            categoryChooser.setEnabled(false);
-            categorybutton.setEnabled(false);
-        });
+        buttonPanel.setPreferredSize(new Dimension(500, 200));
+        buttonPanel.setBorder(new EmptyBorder(0, 30, 0, 0));
 
-        add(continueButton, BorderLayout.SOUTH);
         continueButton.setVisible(false);
-        panelLeft.add(playerOne);
-        panelRight.add(playerTwo);
-        panelLeft.setBackground(Color.ORANGE);
-        panelRight.setBackground(Color.ORANGE);
-        add(panelLeft, BorderLayout.WEST);
-        add(panelRight, BorderLayout.EAST);
+        leftPanel.add(playerOne);
+        rightPanel.add(playerTwo);
+        leftPanel.setBackground(Color.ORANGE);
+        rightPanel.setBackground(Color.ORANGE);
+        add(leftPanel, BorderLayout.WEST);
+        add(rightPanel, BorderLayout.EAST);
 
         playerTwo.setBackground(Color.ORANGE);
-        centerPanel.add(answersPanel, BorderLayout.SOUTH);
-        add(centerPanel, BorderLayout.CENTER);
-        add(categoryPanel, BorderLayout.NORTH);
+        centerPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         label.setEnabled(false);
         label.setLineWrap(true);
@@ -85,14 +81,20 @@ public class Client extends JFrame implements Runnable {
         label.setFont(label.getFont().deriveFont(15.0f));
 
         categoryPanel.setBackground(Color.ORANGE);
-        answersPanel.setBackground(Color.ORANGE);
+        buttonPanel.setBackground(Color.ORANGE);
         centerPanel.setBackground(Color.ORANGE);
+
+        setLayout(new BorderLayout());
+        add(centerPanel, BorderLayout.CENTER);
+        add(categoryPanel, BorderLayout.NORTH);
+        add(continueButton, BorderLayout.SOUTH);
+
         setBackground(Color.ORANGE);
         setSize(700, 600);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        thread.start();
-    }//CONSTRUCTOR
+        new Thread(this).start();
+    }
 
     @Override
     public void run() {
@@ -103,7 +105,7 @@ public class Client extends JFrame implements Runnable {
             while ((obj = session.read()) != null) {
                 if (obj instanceof Question) {
                     Question question = (Question) obj;
-                    showTheQuestion(question);
+                    showQuestion(question);
                 } else if (obj instanceof ServerMessage) {
                     ServerMessage fromServer = (ServerMessage) obj;
                     processServerMessage(fromServer);
@@ -112,7 +114,7 @@ public class Client extends JFrame implements Runnable {
                     showTheMessageFromServer(message);
                 } else if (obj instanceof Integer[]) {
                     Integer[] points = (Integer[]) obj;
-                    showThePoints(points);
+                    showPoints(points);
                 } else if (obj instanceof ArrayList) {
                     // Kontrollera typer!
                     ArrayList<java.util.List> lista = (ArrayList) obj;
@@ -132,17 +134,19 @@ public class Client extends JFrame implements Runnable {
         }
     }//run()
 
-    private void showTheQuestion(Question question) {
+    private void showQuestion(Question question) {
         label.setText("\n\n\n\n\n\n             " + question.getQuestion());
         List<String> alt = question.getAlternatives();
         checkAnswer = (question::isRightAnswer);
+        for (Component c : buttonPanel.getComponents()) {
+            c.setEnabled(true);
+        }
         for (int i = 0; i < alt.size(); i++) {
-            buttons[i].setEnabled(true);
             buttons[i].setText(alt.get(i));
         }
     }
 
-    private void showThePoints(Integer[] points) {
+    private void showPoints(Integer[] points) {
         if (playerOne.getText().equals("Player 1")) {
             playerOne.setText("P1 : " + points[0]);
             playerTwo.setText("P2 : " + points[1]);
@@ -164,21 +168,20 @@ public class Client extends JFrame implements Runnable {
                 playerOne.setText("Player 1");
             }
         } else if (fromServer.HEADER == ServerMessage.Headers.WAIT) {
-            for (JButton button : buttons) {
-                button.setEnabled(false);
+            for (Component c : buttonPanel.getComponents()) {
+                c.setEnabled(false);
             }
             categoryChooser.setEnabled(false);
-            categorybutton.setEnabled(false);
+            categoryButton.setEnabled(false);
             label.setText("\n\n\n\n\n\n\n                    " + fromServer.MESSAGE);
         } else if (fromServer.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
             String[] categories = fromServer.MESSAGE.split(";");
-            System.out.println(Arrays.toString(categories));
             categoryChooser.removeAllItems();
             for (String s : categories) {
                 categoryChooser.addItem(s);
             }
-            categorybutton.setEnabled(true);
             categoryChooser.setEnabled(true);
+            categoryButton.setEnabled(true);
             label.setText("\n\n\n\n\n\n                     " + "Choose category");
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_WIN) {
             JOptionPane.showMessageDialog(this, "YOU WIN", "Congratulations",
@@ -205,11 +208,10 @@ public class Client extends JFrame implements Runnable {
                 playerOne.setText("Player 1");
             }
         } else if (message.startsWith("Wait")) {
-            for (JButton button : buttons) {
-                button.setEnabled(false);
+            for (Component c : buttonPanel.getComponents()) {
+                c.setEnabled(false);
             }
-            categoryChooser.setEnabled(false);
-            categorybutton.setEnabled(false);
+            categoryPanel.setEnabled(false);
             label.setText("\n\n\n\n\n\n\n                    " + message);
         } else if (message.startsWith("YOU WIN")) {
             JOptionPane.showMessageDialog(this, "YOU WIN", "Congratulations", JOptionPane.INFORMATION_MESSAGE);
@@ -218,8 +220,8 @@ public class Client extends JFrame implements Runnable {
         } else if (message.startsWith("YOU TIED")) {
             JOptionPane.showMessageDialog(this, "YOU TIED", " ", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            categorybutton.setEnabled(true);
             categoryChooser.setEnabled(true);
+            categoryButton.setEnabled(true);
             label.setText("\n\n\n\n\n\n                     " + message);
         }
     }
@@ -236,9 +238,9 @@ public class Client extends JFrame implements Runnable {
     private ActionListener alternativesListener = e -> {
         JButton temp = (JButton) e.getSource();
         categoryChooser.setEnabled(false);
-        categorybutton.setEnabled(false);
-        for (JButton button : buttons) {
-            button.setEnabled(false);
+        categoryButton.setEnabled(false);
+        for (Component c : buttonPanel.getComponents()) {
+            c.setEnabled(false);
         }
         changeButtonsColor(temp);
         continueButton.setVisible(true);
