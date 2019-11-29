@@ -59,8 +59,6 @@ public class ServerSideGame extends Thread {
             currentPlayer.getOpponent().totPoints = 0;
             currentRound = currentRound % totalRounds;
             sendPoints();
-            db.resetCount();
-            db.shuffleLists();
         }
     }
 
@@ -85,9 +83,7 @@ public class ServerSideGame extends Thread {
     private void sendPointsHistory() throws IOException {
         ArrayList<List> histories = new ArrayList<>();
         histories.add(getPlayerOne().scoreHistory);
-        //System.out.println("send points history test: " + histories);
         histories.add(getPlayerTwo().scoreHistory);
-        //System.out.println("send points history test efter oponentplayer: " + histories);
 
         getPlayerOne().outputObject.reset();
         getPlayerOne().outputObject.writeObject(histories);
@@ -104,9 +100,7 @@ public class ServerSideGame extends Thread {
 
     private void switchingPlayer() throws IOException {
         if (isRoundOver()) {
-            System.out.println(questions.size());
             currentState = States.ALL_QUESTIONS_ANSWERED;
-            System.out.println(questions.size());
         } else {
             switchPlayer();
             currentPlayer.getOpponent().outputObject
@@ -134,10 +128,9 @@ public class ServerSideGame extends Thread {
                 tempScore++;
             }
             nextQuestion();// index ökar med 1
-        }//while
+        }
         currentPlayer.scoreHistory.add(tempScore);
-        //   System.out.println(currentPlayer.scoreHistory.toString());
-    }//handleQuestions
+    }
 
     private void hasWinner() throws IOException {
         if (isGameOver()) {
@@ -162,7 +155,6 @@ public class ServerSideGame extends Thread {
             // en annan lösning är att man endast nollställer om questionNumber når list.size()
             currentPlayer.questionNumber = 0;
             currentPlayer.getOpponent().questionNumber = 0;
-            ///currentRound++; ökar i selectCategory
             return true;
         } else {
             return false;

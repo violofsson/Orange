@@ -28,7 +28,6 @@ public class Client extends JFrame implements Runnable {
     private JButton continueButton = new JButton("Continue");
     private JButton[] buttons = new JButton[4];
     private String[] strings = {"Allan", "Fazli Zekiqi", "Victor J", "Victor O"};
-    //private JLabel label = new JLabel("Welcome to the Quiz Fight", SwingConstants.CENTER);
     private JLabel playerOne = new JLabel("s1");
     private JLabel playerTwo = new JLabel("s2");
     private JPanel gridPanel = new JPanel(new GridLayout(2, 2));
@@ -66,7 +65,6 @@ public class Client extends JFrame implements Runnable {
 
         categorybutton.addActionListener(e -> {
             pw.println(categoryChooser.getSelectedItem());
-            System.out.println("VALD KATEGORI" + categoryChooser.getSelectedItem());
             categoryChooser.setEnabled(false);
             categorybutton.setEnabled(false);
         });
@@ -139,7 +137,6 @@ public class Client extends JFrame implements Runnable {
     }//run()
 
     private void showTheQuestion(Question question) {
-        System.out.println(question.getQuestion());
         label.setText("\n\n\n\n\n\n             " + question.getQuestion());
         ArrayList<String> alt = question.getAlternatives();
         checkAnswer = (question::isRightAnswer);
