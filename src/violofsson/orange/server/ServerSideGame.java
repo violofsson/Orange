@@ -1,6 +1,7 @@
 package violofsson.orange.server;
 
 import violofsson.orange.protocol.Question;
+import violofsson.orange.protocol.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,11 +33,13 @@ public class ServerSideGame extends Thread {
         try {
             while (true) {
                 if (currentState == States.SELECTING_CATEGORY) {
-                    currentPlayer.getOpponent().outputObject.writeObject(
+                    currentPlayer.getOpponent().sendMessage(
+                            ServerMessage.Headers.WAIT,
                             "Wait until other player chooses a category!");
                     choosingCategory();
                     currentState = States.ASKING_QUESTIONS;
-                    currentPlayer.getOpponent().outputObject.writeObject(
+                    currentPlayer.getOpponent().sendMessage(
+                            ServerMessage.Headers.WAIT,
                             "Wait until other player answer");
                 } else if (currentState == States.ASKING_QUESTIONS) {
                     handleQuestions();
@@ -122,7 +125,7 @@ public class ServerSideGame extends Thread {
         int tempScore = 0;
         while (!allQuestionsAnswered()) {
             q = questions.get(currentPlayer.questionNumber);
-            currentPlayer.outputObject.writeObject(q);
+            currentPlayer.sendQuestion(q);
             String answer = currentPlayer.input.readLine();
 
             if (q.isRightAnswer(answer)) {
@@ -137,14 +140,20 @@ public class ServerSideGame extends Thread {
     private void hasWinner() throws IOException {
         if (isGameOver()) {
             if (currentPlayer.totPoints > currentPlayer.getOpponent().totPoints) {
-                currentPlayer.outputObject.writeObject("YOU WIN");
-                currentPlayer.getOpponent().outputObject.writeObject("YOU LOSE");
+                currentPlayer.sendMessage(
+                        ServerMessage.Headers.YOU_WIN, "YOU WIN");
+                currentPlayer.getOpponent().sendMessage(
+                        ServerMessage.Headers.YOU_LOSE, "YOU LOSE");
             } else if (currentPlayer.totPoints < currentPlayer.getOpponent().totPoints) {
-                currentPlayer.outputObject.writeObject("YOU LOSE");
-                currentPlayer.getOpponent().outputObject.writeObject("YOU WIN");
+                currentPlayer.sendMessage(
+                        ServerMessage.Headers.YOU_LOSE, "YOU LOSE");
+                currentPlayer.getOpponent().sendMessage(
+                        ServerMessage.Headers.YOU_WIN, "YOU WIN");
             } else {
-                currentPlayer.outputObject.writeObject("YOU TIED");
-                currentPlayer.getOpponent().outputObject.writeObject("YOU TIED");
+                currentPlayer.sendMessage(
+                        ServerMessage.Headers.YOU_TIED, "YOU TIED");
+                currentPlayer.getOpponent().sendMessage(
+                        ServerMessage.Headers.YOU_TIED, "YOU TIED");
             }
         }
     }

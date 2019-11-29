@@ -1,5 +1,8 @@
 package violofsson.orange.server;
 
+import violofsson.orange.protocol.Question;
+import violofsson.orange.protocol.ServerMessage;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -26,7 +29,7 @@ public class ServerSidePlayer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }//Constructor
+    }
 
     ServerSidePlayer getOpponent() {
         return this.opponent;
@@ -34,5 +37,15 @@ public class ServerSidePlayer {
 
     void setOpponent(ServerSidePlayer opponent) {
         this.opponent = opponent;
+    }
+
+    void sendMessage(ServerMessage.Headers header, String message) throws IOException {
+        outputObject.reset();
+        outputObject.writeObject(new ServerMessage(header, message));
+    }
+
+    void sendQuestion(Question q) throws IOException {
+        outputObject.reset();
+        outputObject.writeObject(q);
     }
 }

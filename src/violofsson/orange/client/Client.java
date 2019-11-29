@@ -1,6 +1,7 @@
 package violofsson.orange.client;
 
 import violofsson.orange.protocol.Question;
+import violofsson.orange.protocol.ServerMessage;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -112,10 +113,12 @@ public class Client extends JFrame implements Runnable {
                 if (obj instanceof Question) {
                     Question question = (Question) obj;
                     showTheQuestion(question);
+                } else if (obj instanceof ServerMessage) {
+                    ServerMessage fromServer = (ServerMessage) obj;
+                    processServerMessage(fromServer);
                 } else if (obj instanceof String) {
                     String message = (String) obj;
                     showTheMessageFromServer(message);
-
                 } else if (obj instanceof Integer[]) {
                     Integer[] points = (Integer[]) obj;
                     showThePoints(points);
@@ -158,6 +161,40 @@ public class Client extends JFrame implements Runnable {
         }
     }
 
+    private void processServerMessage(ServerMessage fromServer) {
+        if (fromServer.HEADER == ServerMessage.Headers.WELCOME) {
+            if (fromServer.MESSAGE.contains("1")) {
+                playerOne.setText(fromServer.MESSAGE);
+                setTitle(fromServer.MESSAGE);
+                playerTwo.setText("Player 2");
+            } else {
+                playerTwo.setText(fromServer.MESSAGE);
+                setTitle(fromServer.MESSAGE);
+                playerOne.setText("Player 1");
+            }
+        } else if (fromServer.HEADER == ServerMessage.Headers.WAIT) {
+            for (JButton button : buttons) {
+                button.setEnabled(false);
+            }
+            categoryChooser.setEnabled(false);
+            categorybutton.setEnabled(false);
+            label.setText("\n\n\n\n\n\n\n                    " + fromServer.MESSAGE);
+        } else if (fromServer.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
+            categorybutton.setEnabled(true);
+            categoryChooser.setEnabled(true);
+            label.setText("\n\n\n\n\n\n                     " + fromServer.MESSAGE);
+        } else if (fromServer.HEADER == ServerMessage.Headers.YOU_WIN) {
+            JOptionPane.showMessageDialog(this, "YOU WIN", "Congratulations",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else if (fromServer.HEADER == ServerMessage.Headers.YOU_LOSE) {
+            JOptionPane.showMessageDialog(this, "YOU LOSE", "You're defeated", JOptionPane.ERROR_MESSAGE);
+        } else if (fromServer.HEADER == ServerMessage.Headers.YOU_TIED) {
+            JOptionPane.showMessageDialog(this, "YOU TIED", " ", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            label.setText("\n\n\n\n\n\n                     " + fromServer.MESSAGE);
+        }
+    }
+
     private void showTheMessageFromServer(String message) {
         if (message.startsWith("Welcome")) {
             message = message.substring(message.indexOf(' '));
@@ -188,7 +225,7 @@ public class Client extends JFrame implements Runnable {
             categoryChooser.setEnabled(true);
             label.setText("\n\n\n\n\n\n                     " + message);
         }
-    }//showTheMessageFromTheServer
+    }
 
     private String theAnswerFromUser;
     private ActionListener continueButtonListener = e -> {
@@ -197,7 +234,7 @@ public class Client extends JFrame implements Runnable {
             button.setBackground(Color.BLACK);
         }
         pw.println(theAnswerFromUser);
-    };//cnt
+    };
 
     private ActionListener alternativesListener = e -> {
         JButton temp = (JButton) e.getSource();
@@ -209,7 +246,7 @@ public class Client extends JFrame implements Runnable {
         changeButtonsColor(temp);
         continueButton.setVisible(true);
         theAnswerFromUser = temp.getText();
-    };//clientListener
+    };
 
     private void changeButtonsColor(JButton temp) {
         if (checkAnswer.apply(temp.getText())) {
@@ -226,9 +263,9 @@ public class Client extends JFrame implements Runnable {
                 }
             }
         }
-    }//changeColor
+    }
 
-    String getScoreSummary(String playerName, List<Integer> scores) {
+    private String getScoreSummary(String playerName, List<Integer> scores) {
         StringBuilder s = new StringBuilder(playerName + ":");
         int sum = 0;
         for (int i = 0; i < scores.size(); i++) {
