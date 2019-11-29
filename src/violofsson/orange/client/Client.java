@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class Client extends JFrame implements Runnable {
 
@@ -37,7 +38,7 @@ public class Client extends JFrame implements Runnable {
     private Thread thread = new Thread(this);
     int counter;
 
-    private String rightAnswer;
+    private Function<String, Boolean> checkAnswer;
 
     public Client() throws IOException {
         socket = new Socket("localhost", 56565); // 172.20.201.169
@@ -141,7 +142,7 @@ public class Client extends JFrame implements Runnable {
         System.out.println(question.getQuestion());
         label.setText("\n\n\n\n\n\n             " + question.getQuestion());
         ArrayList<String> alt = question.getAlternatives();
-        rightAnswer = question.getRightAnswer();
+        checkAnswer = (question::isRightAnswer);
         for (int i = 0; i < alt.size(); i++) {
             buttons[i].setEnabled(true);
             buttons[i].setText(alt.get(i));
@@ -149,7 +150,7 @@ public class Client extends JFrame implements Runnable {
     }
 
     private void showThePoints(Integer[] points) {
-        if (playerOne.equals("Player 1")) {
+        if (playerOne.getText().equals("Player 1")) {
             playerOne.setText("P1 : " + points[0]);
             playerTwo.setText("P2 : " + points[1]);
         } else {
@@ -212,7 +213,7 @@ public class Client extends JFrame implements Runnable {
     };//clientListener
 
     private void changeButtonsColor(JButton temp) {
-        if (temp.getText().equalsIgnoreCase(rightAnswer)) {
+        if (checkAnswer.apply(temp.getText())) {
             temp.setBackground(Color.GREEN);
             temp.setOpaque(true);
         } else {
@@ -220,7 +221,7 @@ public class Client extends JFrame implements Runnable {
             temp.setOpaque(true);
 
             for (JButton button : buttons) {
-                if (button.getText().equalsIgnoreCase(rightAnswer)) {
+                if (checkAnswer.apply(button.getText())) {
                     button.setBackground(Color.green);
                     button.setOpaque(true);
                 }
@@ -235,7 +236,7 @@ public class Client extends JFrame implements Runnable {
             sum += scores.get(i);
             s.append(String.format("\nRond %d: %d", i + 1, scores.get(i)));
         }
-        s.append("\n\nSumma: " + sum);
+        s.append("\n\nSumma: ").append(sum);
         return s.toString();
     }
 

@@ -19,10 +19,6 @@ public class Question implements Serializable {
         return question;
     }
 
-    public String getRightAnswer() {
-        return rightAnswer;
-    }
-
     public void setQuestion(String question) {
         this.question = question;
     }
