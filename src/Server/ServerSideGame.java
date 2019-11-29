@@ -1,6 +1,7 @@
 package Server;
 
 import Database.Database;
+import Database.DatabaseAlt;
 import question.Question;
 
 import java.io.IOException;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerSideGame extends Thread {
-    private Database db = new Database();
+    private DatabaseAlt db = new DatabaseAlt();
     private ServerSidePlayer currentPlayer;
     private List<Question> questions;
     private int questionsPerRound;
