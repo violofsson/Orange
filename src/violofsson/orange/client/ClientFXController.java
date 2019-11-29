@@ -19,22 +19,16 @@ import java.util.List;
 public class ClientFXController extends Thread {
     @FXML
     HBox categoryPanel;
-
     @FXML
     ComboBox<String> categoryChooser;
-
     @FXML
     Button categoryButton;
-
     @FXML
     Text playerOne;
-
     @FXML
     Text playerTwo;
-
     @FXML
     TextArea messagePanel;
-
     @FXML
     GridPane buttonPanel;
 
@@ -71,7 +65,7 @@ public class ClientFXController extends Thread {
                     displayMessage(message);
                 } else if (obj instanceof Integer[]) {
                     Integer[] points = (Integer[]) obj;
-                    //showPoints(points);
+                    displayPoints(points);
                 } else if (obj instanceof ArrayList) {
                     // Kontrollera typer!
                     ArrayList<List> lista = (ArrayList) obj;
@@ -82,6 +76,9 @@ public class ClientFXController extends Thread {
                     String playerTwoText = getScoreSummary("Spelare 2",
                             playerTwoHistory);
                     JOptionPane.showMessageDialog(this, playerOneText + "\n\n" + playerTwoText);*/
+                    // TODO Ordna en riktig översikt
+                    System.out.println(playerOneHistory.toString());
+                    System.out.println(playerTwoHistory);
                 }
             }
         } catch (IOException e) {
@@ -93,6 +90,11 @@ public class ClientFXController extends Thread {
 
     void displayMessage(String msg) {
         messagePanel.setText(msg);
+    }
+
+    private void displayPoints(Integer[] points) {
+        playerOne.setText("P1 : " + points[0]);
+        playerTwo.setText("P2 : " + points[1]);
     }
 
     void displayQuestion(Question q) {

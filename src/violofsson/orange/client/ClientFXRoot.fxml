@@ -14,24 +14,24 @@
     <top>
         <HBox fx:id="categoryPanel">
             <ComboBox fx:id="categoryChooser"/>
-            <Button fx:id="categoryButton" onAction="#chooseCategory"/>
+            <Button fx:id="categoryButton" text="Select" onAction="#chooseCategory"/>
         </HBox>
     </top>
     <left>
-        <Text fx:id="playerOne" text="P1"/>
+        <Text fx:id="playerOne" text="P1: 0"/>
     </left>
     <right>
-        <Text fx:id="playerTwo" text="P2"/>
+        <Text fx:id="playerTwo" text="P2: 0"/>
     </right>
     <center>
-        <TextArea fx:id="messagePanel"/>
+        <TextArea fx:id="messagePanel" text="Message field" editable="false"/>
     </center>
     <bottom>
         <GridPane fx:id="buttonPanel">
-            <Button onAction="#chooseAnswer" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <Button onAction="#chooseAnswer" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-            <Button onAction="#chooseAnswer" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <Button onAction="#chooseAnswer" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <Button onAction="#chooseAnswer" text="Button 1" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Button onAction="#chooseAnswer" text="Button 2" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Button onAction="#chooseAnswer" text="Button 3" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Button onAction="#chooseAnswer" text="Button 4" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
         </GridPane>
     </bottom>
 </BorderPane>
