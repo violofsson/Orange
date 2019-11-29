@@ -16,21 +16,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientFXController extends Thread {
-    @FXML
-    HBox categoryPanel;
-    @FXML
-    ComboBox<String> categoryChooser;
-    @FXML
-    Button categoryButton;
-    @FXML
-    Text playerOne;
-    @FXML
-    Text playerTwo;
-    @FXML
-    TextArea messagePanel;
-    @FXML
-    GridPane buttonPanel;
+public class ClientFXController {
+    @FXML HBox categoryPanel;
+    @FXML ComboBox<String> categoryChooser;
+    @FXML Button categoryButton;
+    @FXML Text playerOne;
+    @FXML Text playerTwo;
+    @FXML TextArea messagePanel;
+    @FXML GridPane buttonPanel;
 
     private ClientSession session;
 
@@ -38,29 +31,28 @@ public class ClientFXController extends Thread {
     void chooseAnswer(ActionEvent actionEvent) {
         String answer = ((Button) actionEvent.getSource()).getText();
         setAnswersDisable(true);
-        session.write(answer);
+        session.send(answer);
     }
 
     @FXML
     void chooseCategory() {
         String chosen = categoryChooser.getSelectionModel().getSelectedItem();
         setCategoryDisable(true);
-        session.write(chosen);
+        session.send(chosen);
     }
 
     @FXML
     public void initialize() throws IOException {
         // TODO IllegalStateException
-        session = new ClientSession();
-        this.start();
+        session = new ClientSession(this);
     }
 
-    @Override
+    /*@Override
     public void run() {
         Object obj;
 
         try {
-            while ((obj = session.read()) != null) {
+            while ((obj = session.receive()) != null) {
                 if (obj instanceof Question) {
                     Question question = (Question) obj;
                     displayQuestion(question);
@@ -83,7 +75,7 @@ public class ClientFXController extends Thread {
                     String playerTwoText = getScoreSummary("Spelare 2",
                             playerTwoHistory);
                     JOptionPane.showMessageDialog(this, playerOneText + "\n\n" + playerTwoText);*/
-                    // TODO Ordna en riktig översikt
+                    /*// TODO Ordna en riktig översikt
                     System.out.println(playerOneHistory.toString());
                     System.out.println(playerTwoHistory);
                 }
@@ -93,18 +85,18 @@ public class ClientFXController extends Thread {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    void displayMessage(String msg) {
+    synchronized void displayMessage(String msg) {
         messagePanel.setText(msg);
     }
 
-    private void displayPoints(Integer[] points) {
+    synchronized void displayPoints(Integer[] points) {
         playerOne.setText("P1 : " + points[0]);
         playerTwo.setText("P2 : " + points[1]);
     }
 
-    void displayQuestion(Question q) {
+    synchronized void displayQuestion(Question q) {
         displayMessage(q.getQuestion());
         List<String> alternatives = q.getAlternatives();
         for (int i = 0; i < buttonPanel.getChildren().size(); i++) {
@@ -122,7 +114,11 @@ public class ClientFXController extends Thread {
         return dialog;
     }
 
-    private void processServerMessage(ServerMessage fromServer) {
+    ClientSession getSession() {
+        return session;
+    }
+
+    synchronized void processServerMessage(ServerMessage fromServer) {
         if (fromServer.HEADER == ServerMessage.Headers.WELCOME) {
             if (fromServer.MESSAGE.contains("1")) {
                 playerOne.setText(fromServer.MESSAGE);

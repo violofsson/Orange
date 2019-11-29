@@ -1,4 +1,4 @@
-package violofsson.orange.client;
+/*package violofsson.orange.client;
 
 import violofsson.orange.protocol.Question;
 import violofsson.orange.protocol.ServerMessage;
@@ -38,7 +38,7 @@ public class Client extends JFrame implements Runnable {
         categoryChooser.setSelectedIndex(0);
 
         categoryButton.addActionListener(e -> {
-            session.write(categoryChooser.getSelectedItem());
+            session.send(categoryChooser.getSelectedItem());
             categoryChooser.setEnabled(false);
             categoryButton.setEnabled(false);
         });
@@ -102,7 +102,7 @@ public class Client extends JFrame implements Runnable {
         continueButton.addActionListener(continueButtonListener);
 
         try {
-            while ((obj = session.read()) != null) {
+            while ((obj = session.receive()) != null) {
                 if (obj instanceof Question) {
                     Question question = (Question) obj;
                     showQuestion(question);
@@ -232,7 +232,7 @@ public class Client extends JFrame implements Runnable {
         for (JButton button : buttons) {
             button.setBackground(Color.BLACK);
         }
-        session.write(theAnswerFromUser);
+        session.send(theAnswerFromUser);
     };
 
     private ActionListener alternativesListener = e -> {
@@ -282,4 +282,4 @@ public class Client extends JFrame implements Runnable {
             e.printStackTrace();
         }
     }
-}
+}*/
