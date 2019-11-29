@@ -8,12 +8,33 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+// TODO Hantera nätfel och andra specialfall
+
 public class Database {
-    static class QuestionResponse {
-        int response_code;
+    static class CategoryAPICall {
+        List<CategoryEntry> trivia_categories;
+
+        Map<String, Integer> getCategories() {
+            return trivia_categories.stream()
+                    .collect(Collectors.toMap(
+                            c -> URLDecoder.decode(
+                                    c.name, StandardCharsets.UTF_8),
+                            c -> c.id));
+        }
+    }
+
+    static class CategoryEntry {
+        int id;
+        String name;
+    }
+
+    static class QuestionAPICall {
         List<SerializedQuestion> results;
 
         List<Question> getQuestions() {
@@ -24,7 +45,6 @@ public class Database {
     }
 
     static class SerializedQuestion {
-        String category;
         String question;
         String correct_answer;
         List<String> incorrect_answers;
@@ -50,12 +70,14 @@ public class Database {
         private String token;
     }*/
 
-    Gson deserializer = new Gson();
-    //String apiToken;
+    private Gson deserializer = new Gson();
+    //private String apiToken;
+    private Map<String, Integer> categoryIDs;
 
     public Database() {
-        /*try {
-            URL tokenRequestURL = new URL("https://opentdb.com/api_token.php?command=request");
+        try {
+            loadCategories();
+            /*URL tokenRequestURL = new URL("https://opentdb.com/api_token.php?command=request");
             TokenResponse tr = deserializer.fromJson(
                     new InputStreamReader(
                             tokenRequestURL.openStream()),
@@ -63,26 +85,37 @@ public class Database {
             if (tr.response_code == 0)
                 apiToken = tr.token;
             else
-                throw new IOException();
+                throw new IOException();*/
         } catch (IOException ioe) {
             ioe.printStackTrace();
-        }*/
+        }
+    }
+
+    public List<String> getRandomCategories(int wantedCategories) {
+        // TODO Tomma och/eller stora listor
+        if (wantedCategories >= categoryIDs.size()) {
+            wantedCategories = categoryIDs.size();
+        }
+        List<String> categories = new ArrayList<>(categoryIDs.keySet());
+        Collections.shuffle(categories);
+        return categories.subList(0, wantedCategories);
     }
 
     public List<Question> getQuestions(String wantedCategory, int numberOfQuestions) {
         try {
-            int categoryId = 9;
+            int categoryId = categoryIDs.getOrDefault(wantedCategory,
+                    9);
             URL questionRequest = new URL(
                     "https://opentdb.com/api.php?amount="
                             + numberOfQuestions
                             + "&category=" + categoryId
                             + "&encode=url3986"
                             + "&type=multiple"
-                            /*+ "&token=" + apiToken*/);
-            QuestionResponse qr = deserializer.fromJson(
+                    /*+ "&token=" + apiToken*/);
+            QuestionAPICall qr = deserializer.fromJson(
                     new InputStreamReader(
                             questionRequest.openStream()),
-                    QuestionResponse.class);
+                    QuestionAPICall.class);
             return qr.getQuestions();
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -90,7 +123,17 @@ public class Database {
         }
     }
 
-    public void resetCount() {}
+    private void loadCategories() throws IOException {
+        URL categoryURL = new URL("https://opentdb.com/api_category.php");
+        CategoryAPICall categories = deserializer.fromJson(
+                new InputStreamReader(categoryURL.openStream()),
+                CategoryAPICall.class);
+        categoryIDs = categories.getCategories();
+    }
 
-    public void shuffleLists() {}
+    public void resetCount() {
+    }
+
+    public void shuffleLists() {
+    }
 }
