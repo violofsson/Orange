@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Text?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="violofsson.orange.client.ClientFXController"
+            prefHeight="600.0" prefWidth="400.0">
+    <top>
+        <HBox fx:id="categoryPanel">
+            <ComboBox fx:id="categoryChooser"/>
+            <Button fx:id="categoryButton" onAction="#chooseCategory"/>
+        </HBox>
+    </top>
+    <left>
+        <Text fx:id="playerOne" text="P1"/>
+    </left>
+    <right>
+        <Text fx:id="playerTwo" text="P2"/>
+    </right>
+    <center>
+        <TextArea fx:id="messagePanel"/>
+    </center>
+    <bottom>
+        <GridPane fx:id="buttonPanel">
+            <Button onAction="#chooseAnswer" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Button onAction="#chooseAnswer" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Button onAction="#chooseAnswer" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Button onAction="#chooseAnswer" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        </GridPane>
+    </bottom>
+</BorderPane>
