@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Client extends JFrame implements Runnable {
-
     private Socket socket;
     private ObjectInputStream in;
     private PrintWriter pw;
+    ClientSession session;
     private final String[] colors = {"Candy", "Egg", "Famous", "Random"};
     private JComboBox<String> categoryChooser;
     private JPanel p = new JPanel();
@@ -41,14 +41,12 @@ public class Client extends JFrame implements Runnable {
     private Function<String, Boolean> checkAnswer;
 
     public Client() throws IOException {
-        socket = new Socket("localhost", 56565); // 172.20.201.169
-        in = new ObjectInputStream(socket.getInputStream());
-        pw = new PrintWriter(socket.getOutputStream(), true);
+        session = new ClientSession();
 
         gridPanel.setPreferredSize(new Dimension(500, 200));
         gridPanel.setBorder(new EmptyBorder(0, 30, 0, 0));
         setLayout(new BorderLayout());
-        categoryChooser = new JComboBox(colors);
+        categoryChooser = new JComboBox<>(colors);
         categoryChooser.setSelectedIndex(0);
 
         p.add(categoryChooser);
@@ -65,7 +63,7 @@ public class Client extends JFrame implements Runnable {
         }
 
         categorybutton.addActionListener(e -> {
-            pw.println(categoryChooser.getSelectedItem());
+            session.write(categoryChooser.getSelectedItem());
             categoryChooser.setEnabled(false);
             categorybutton.setEnabled(false);
         });
@@ -92,7 +90,6 @@ public class Client extends JFrame implements Runnable {
 
         label.setFont(label.getFont().deriveFont(15.0f));
 
-
         p.setBackground(Color.ORANGE);
         gridPanel.setBackground(Color.ORANGE);
         centerPanel.setBackground(Color.ORANGE);
@@ -109,7 +106,7 @@ public class Client extends JFrame implements Runnable {
         continueButton.addActionListener(continueButtonListener);
 
         try {
-            while ((obj = in.readObject()) != null) {
+            while ((obj = session.read()) != null) {
                 if (obj instanceof Question) {
                     Question question = (Question) obj;
                     showTheQuestion(question);
@@ -239,7 +236,7 @@ public class Client extends JFrame implements Runnable {
         for (JButton button : buttons) {
             button.setBackground(Color.BLACK);
         }
-        pw.println(theAnswerFromUser);
+        session.write(theAnswerFromUser);
     };
 
     private ActionListener alternativesListener = e -> {
