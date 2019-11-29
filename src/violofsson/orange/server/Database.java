@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 // TODO Hantera nätfel och andra specialfall
 
-public class Database {
+class Database {
     static class CategoryAPICall {
         List<CategoryAPIEntry> trivia_categories;
     }
@@ -28,7 +28,6 @@ public class Database {
 
     static class QuestionAPICall {
         List<SerializedQuestion> results;
-
         List<Question> getQuestions() {
             return results.stream().map(SerializedQuestion::toRealQuestion)
                     .collect(Collectors.toList());
@@ -62,7 +61,7 @@ public class Database {
     //private String apiToken;
     private Map<String, Integer> categoryIDs;
 
-    public Database() {
+    Database() {
         try {
             loadCategories();
             /*URL tokenRequestURL = new URL(
@@ -80,7 +79,7 @@ public class Database {
         }
     }
 
-    public List<String> getRandomCategories(int wantedCategories) {
+    private List<String> getRandomCategories(int wantedCategories) {
         // TODO Tomma och/eller stora listor
         if (wantedCategories >= categoryIDs.size()) {
             wantedCategories = categoryIDs.size();
@@ -90,8 +89,8 @@ public class Database {
         return categories.subList(0, wantedCategories);
     }
 
-    public List<Question> getQuestions(String wantedCategory,
-                                       int numberOfQuestions) {
+    List<Question> getQuestions(String wantedCategory,
+                                int numberOfQuestions) {
         try {
             int categoryId = categoryIDs.getOrDefault(wantedCategory, 9);
             URL questionRequest = new URL(

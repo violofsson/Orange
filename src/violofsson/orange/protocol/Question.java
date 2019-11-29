@@ -9,7 +9,7 @@ public class Question implements Serializable {
     static final long serialVersionUID = 42L;
     private String question;
     private String rightAnswer;
-    public List<String> alternatives = new ArrayList<>();
+    private List<String> alternatives = new ArrayList<>();
 
     public Question(String question, String rightAnswer, List<String> wrongAnswers) {
         this.question = question;
@@ -25,14 +25,6 @@ public class Question implements Serializable {
 
     public String getQuestion() {
         return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-
-    public void setRightAnswer(String rightAnswer) {
-        this.rightAnswer = rightAnswer;
     }
 
     public boolean isRightAnswer(String s) {

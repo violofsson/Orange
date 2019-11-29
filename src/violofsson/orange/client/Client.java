@@ -8,9 +8,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,16 +17,15 @@ public class Client extends JFrame implements Runnable {
     private ClientSession session;
     private final String[] colors = {"Candy", "Egg", "Famous", "Random"};
     private JComboBox<String> categoryChooser;
-    private JPanel p = new JPanel();
+    private JPanel categoryPanel = new JPanel();
     private JTextArea label = new JTextArea();
 
     private JButton categorybutton = new JButton("Start Game");
     private JButton continueButton = new JButton("Continue");
     private JButton[] buttons = new JButton[4];
-    private String[] strings = {"Allan", "Fazli Zekiqi", "Victor J", "Victor O"};
     private JLabel playerOne = new JLabel("s1");
     private JLabel playerTwo = new JLabel("s2");
-    private JPanel gridPanel = new JPanel(new GridLayout(2, 2));
+    private JPanel answersPanel = new JPanel(new GridLayout(2, 2));
     private JPanel panelLeft = new JPanel();
     private JPanel panelRight = new JPanel();
     private JPanel centerPanel = new JPanel(new BorderLayout());
@@ -40,23 +36,24 @@ public class Client extends JFrame implements Runnable {
     public Client() throws IOException {
         session = new ClientSession();
 
-        gridPanel.setPreferredSize(new Dimension(500, 200));
-        gridPanel.setBorder(new EmptyBorder(0, 30, 0, 0));
+        answersPanel.setPreferredSize(new Dimension(500, 200));
+        answersPanel.setBorder(new EmptyBorder(0, 30, 0, 0));
         setLayout(new BorderLayout());
         categoryChooser = new JComboBox<>(colors);
         categoryChooser.setSelectedIndex(0);
 
-        p.add(categoryChooser);
-        p.add(categorybutton);
+        categoryPanel.add(categoryChooser);
+        categoryPanel.add(categorybutton);
         centerPanel.add(label, BorderLayout.CENTER);
 
         for (int i = 0; i < buttons.length; i++) {
+            String[] strings = {"Allan", "Fazli Zekiqi", "Victor J", "Victor O"};
             buttons[i] = new JButton(strings[i]);
             buttons[i].addActionListener(alternativesListener);
             buttons[i].setEnabled(false);
             buttons[i].setBackground(Color.BLACK);
             buttons[i].setForeground(Color.WHITE);
-            gridPanel.add(buttons[i]);
+            answersPanel.add(buttons[i]);
         }
 
         categorybutton.addActionListener(e -> {
@@ -75,9 +72,9 @@ public class Client extends JFrame implements Runnable {
         add(panelRight, BorderLayout.EAST);
 
         playerTwo.setBackground(Color.ORANGE);
-        centerPanel.add(gridPanel, BorderLayout.SOUTH);
+        centerPanel.add(answersPanel, BorderLayout.SOUTH);
         add(centerPanel, BorderLayout.CENTER);
-        add(p, BorderLayout.NORTH);
+        add(categoryPanel, BorderLayout.NORTH);
 
         label.setEnabled(false);
         label.setLineWrap(true);
@@ -87,8 +84,8 @@ public class Client extends JFrame implements Runnable {
 
         label.setFont(label.getFont().deriveFont(15.0f));
 
-        p.setBackground(Color.ORANGE);
-        gridPanel.setBackground(Color.ORANGE);
+        categoryPanel.setBackground(Color.ORANGE);
+        answersPanel.setBackground(Color.ORANGE);
         centerPanel.setBackground(Color.ORANGE);
         setBackground(Color.ORANGE);
         setSize(700, 600);

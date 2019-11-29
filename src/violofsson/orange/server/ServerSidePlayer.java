@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerSidePlayer {
+class ServerSidePlayer {
     private ServerSidePlayer opponent;
     int totPoints = 0;
     int questionNumber = 0;
@@ -23,7 +23,8 @@ public class ServerSidePlayer {
 
         try {
             outputObject = new ObjectOutputStream(socket.getOutputStream());
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            input = new BufferedReader(new InputStreamReader(
+                    socket.getInputStream()));
             outputObject.writeObject("Welcome: "+name);
             outputObject.writeObject("Wait until the other player is connected!");
         } catch (IOException e) {
