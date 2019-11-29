@@ -1,6 +1,7 @@
 package violofsson.orange.server;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import violofsson.orange.protocol.Question;
 
 import java.io.IOException;
@@ -17,19 +18,7 @@ import java.util.stream.Collectors;
 // TODO Hantera nätfel och andra specialfall
 
 public class Database {
-    static class CategoryAPICall {
-        List<CategoryEntry> trivia_categories;
-
-        Map<String, Integer> getCategories() {
-            return trivia_categories.stream()
-                    .collect(Collectors.toMap(
-                            c -> URLDecoder.decode(
-                                    c.name, StandardCharsets.UTF_8),
-                            c -> c.id));
-        }
-    }
-
-    static class CategoryEntry {
+    static class CategoryAPIEntry {
         int id;
         String name;
     }
@@ -125,10 +114,16 @@ public class Database {
 
     private void loadCategories() throws IOException {
         URL categoryURL = new URL("https://opentdb.com/api_category.php");
-        CategoryAPICall categories = deserializer.fromJson(
+        List<CategoryAPIEntry> categories = deserializer.fromJson(
                 new InputStreamReader(categoryURL.openStream()),
-                CategoryAPICall.class);
-        categoryIDs = categories.getCategories();
+                new TypeToken<List<CategoryAPIEntry>>() {
+                }.getType());
+        //categoryIDs = categories.getCategories();
+        categoryIDs = categories.stream()
+                .collect(Collectors.toMap(
+                        c -> URLDecoder.decode(
+                                c.name, StandardCharsets.UTF_8),
+                        c -> c.id));
     }
 
     public void resetCount() {
