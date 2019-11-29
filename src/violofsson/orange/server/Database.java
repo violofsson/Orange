@@ -65,7 +65,8 @@ public class Database {
     public Database() {
         try {
             loadCategories();
-            /*URL tokenRequestURL = new URL("https://opentdb.com/api_token.php?command=request");
+            /*URL tokenRequestURL = new URL(
+            "https://opentdb.com/api_token.php?command=request");
             TokenResponse tr = deserializer.fromJson(
                     new InputStreamReader(
                             tokenRequestURL.openStream()),

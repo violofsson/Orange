@@ -15,8 +15,8 @@ public class ServerSidePlayer {
     String name;
     List <Integer> scoreHistory = new ArrayList<>();
 
-    BufferedReader input;
-    ObjectOutputStream outputObject;
+    private BufferedReader input;
+    private ObjectOutputStream outputObject;
 
     ServerSidePlayer(Socket socket, String name) {
         this.name = name;
@@ -35,6 +35,10 @@ public class ServerSidePlayer {
         return this.opponent;
     }
 
+    String readLine() throws IOException {
+        return input.readLine();
+    }
+
     void setOpponent(ServerSidePlayer opponent) {
         this.opponent = opponent;
     }
@@ -42,6 +46,11 @@ public class ServerSidePlayer {
     void sendMessage(ServerMessage.Headers header, String message) throws IOException {
         outputObject.reset();
         outputObject.writeObject(new ServerMessage(header, message));
+    }
+
+    void sendObject(Object obj) throws IOException {
+        outputObject.reset();
+        outputObject.writeObject(obj);
     }
 
     void sendQuestion(Question q) throws IOException {

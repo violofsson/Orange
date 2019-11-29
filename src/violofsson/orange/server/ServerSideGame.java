@@ -90,16 +90,14 @@ public class ServerSideGame extends Thread {
         histories.add(getPlayerOne().scoreHistory);
         histories.add(getPlayerTwo().scoreHistory);
 
-        getPlayerOne().outputObject.reset();
-        getPlayerOne().outputObject.writeObject(histories);
-        getPlayerTwo().outputObject.reset();
-        getPlayerTwo().outputObject.writeObject(histories);
+        getPlayerOne().sendObject(histories);
+        getPlayerTwo().sendObject(histories);
     }
 
     private void sendPoints() throws IOException {
         Integer[] points = {getPlayerOne().totPoints, getPlayerTwo().totPoints};
-        getPlayerOne().outputObject.writeObject(points);
-        getPlayerTwo().outputObject.writeObject(points);
+        getPlayerOne().sendObject(points);
+        getPlayerTwo().sendObject(points);
         currentState = States.SELECTING_CATEGORY;
     }
 
@@ -108,15 +106,16 @@ public class ServerSideGame extends Thread {
             currentState = States.ALL_QUESTIONS_ANSWERED;
         } else {
             switchPlayer();
-            currentPlayer.getOpponent().outputObject
-                    .writeObject("Wait for the opponent");
+            currentPlayer.getOpponent().sendMessage(ServerMessage.Headers.WAIT,
+                    "Wait for the opponent");
             currentState = States.ASKING_QUESTIONS;
         }
     }
 
     private void choosingCategory() throws IOException {
-        currentPlayer.sendMessage(ServerMessage.Headers.CHOOSE_CATEGORY, db.getCategoryString());
-        String category = currentPlayer.input.readLine();
+        currentPlayer.sendMessage(ServerMessage.Headers.CHOOSE_CATEGORY,
+                db.getCategoryString());
+        String category = currentPlayer.readLine();
         selectCategory(category);
     }
 
@@ -126,7 +125,7 @@ public class ServerSideGame extends Thread {
         while (!allQuestionsAnswered()) {
             q = questions.get(currentPlayer.questionNumber);
             currentPlayer.sendQuestion(q);
-            String answer = currentPlayer.input.readLine();
+            String answer = currentPlayer.readLine();
 
             if (q.isRightAnswer(answer)) {
                 currentPlayer.totPoints++;
