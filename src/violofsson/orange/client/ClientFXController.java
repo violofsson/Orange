@@ -48,6 +48,13 @@ public class ClientFXController extends Thread {
         session.write(chosen);
     }
 
+    @FXML
+    public void initialize() throws IOException {
+        // TODO IllegalStateException
+        session = new ClientSession();
+        this.start();
+    }
+
     @Override
     public void run() {
         Object obj;
