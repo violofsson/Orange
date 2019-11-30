@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Text?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="violofsson.orange.client.ClientFXController"
+            fx:controller="violofsson.orange.fxclient.FXClientController"
             prefHeight="600.0" prefWidth="400.0">
     <top>
         <HBox fx:id="categoryPanel">

@@ -1,4 +1,4 @@
-package violofsson.orange.client;
+package violofsson.orange.fxclient;
 
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -16,7 +16,7 @@ import violofsson.orange.protocol.ServerMessage;
 import java.io.IOException;
 import java.util.List;
 
-public class ClientFXController {
+public class FXClientController {
     @FXML HBox categoryPanel;
     @FXML ComboBox<String> categoryChooser;
     @FXML Button categoryButton;
@@ -26,7 +26,7 @@ public class ClientFXController {
     @FXML GridPane buttonPanel;
     @FXML Button continueButton;
 
-    private ClientSession session;
+    private FXClientSession session;
     private String chosenAnswer;
 
     @FXML
@@ -51,7 +51,7 @@ public class ClientFXController {
 
     @FXML
     public void initialize() throws IOException {
-        session = new ClientSession(this);
+        session = new FXClientSession(this);
         // TODO Ta reda på hur det här ens fungerar
         Task<Void> task = new Task<>() {
             @Override

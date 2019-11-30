@@ -1,4 +1,4 @@
-package violofsson.orange.client;
+package violofsson.orange.fxclient;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class ClientFX extends Application {
+public class FXClient extends Application {
     private Stage primaryStage;
 
     @Override
@@ -21,7 +21,7 @@ public class ClientFX extends Application {
     public void initRootLayout() {
         try {
             Parent root = FXMLLoader.load(getClass()
-                    .getResource("ClientFXRoot.fxml"));
+                    .getResource("FXClientRoot.fxml"));
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();

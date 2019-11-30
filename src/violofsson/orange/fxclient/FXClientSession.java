@@ -1,4 +1,4 @@
-package violofsson.orange.client;
+package violofsson.orange.fxclient;
 
 import javafx.application.Platform;
 import violofsson.orange.protocol.Question;
@@ -11,13 +11,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-class ClientSession implements Runnable {
-    private ClientFXController controller;
+class FXClientSession implements Runnable {
+    private FXClientController controller;
     private Socket socket;
     private PrintWriter out;
     private ObjectInputStream in;
 
-    ClientSession(ClientFXController controller) throws IOException {
+    FXClientSession(FXClientController controller) throws IOException {
         socket = new Socket("localhost", 56565);
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new ObjectInputStream(socket.getInputStream());
