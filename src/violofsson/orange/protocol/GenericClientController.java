@@ -6,10 +6,15 @@ import java.util.List;
 
 public interface GenericClientController extends Runnable {
     void displayMessage(ServerMessage message);
+
     void displayMessage(String s);
+
     void displayQuestion(Question q);
+
     void displayScores(Integer[] scores);
+
     void displayScores(ArrayList<List<Integer>> scores);
+
     ClientConnection getConnection();
 
     default void run() {

@@ -6,12 +6,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientConnection {
-    private Socket socket;
     private PrintWriter out;
     private ObjectInputStream in;
 
     public ClientConnection() throws IOException {
-        socket = new Socket("localhost", 56565);
+        Socket socket = new Socket("localhost", 56565);
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new ObjectInputStream(socket.getInputStream());
     }
