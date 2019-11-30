@@ -13,7 +13,6 @@ import violofsson.orange.protocol.Question;
 import violofsson.orange.protocol.ServerMessage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClientFXController {
@@ -24,14 +23,16 @@ public class ClientFXController {
     @FXML Text playerTwo;
     @FXML TextArea messagePanel;
     @FXML GridPane buttonPanel;
+    @FXML Button continueButton;
 
     private ClientSession session;
+    private String chosenAnswer;
 
     @FXML
     void chooseAnswer(ActionEvent actionEvent) {
-        String answer = ((Button) actionEvent.getSource()).getText();
+        chosenAnswer = ((Button) actionEvent.getSource()).getText();
         setAnswersDisable(true);
-        session.send(answer);
+        setContinueDisable(false);
     }
 
     @FXML
@@ -42,50 +43,15 @@ public class ClientFXController {
     }
 
     @FXML
-    public void initialize() throws IOException {
-        // TODO IllegalStateException
-        session = new ClientSession(this);
+    void nextQuestion() {
+        setContinueDisable(true);
+        session.send(chosenAnswer);
     }
 
-    /*@Override
-    public void run() {
-        Object obj;
-
-        try {
-            while ((obj = session.receive()) != null) {
-                if (obj instanceof Question) {
-                    Question question = (Question) obj;
-                    displayQuestion(question);
-                } else if (obj instanceof ServerMessage) {
-                    ServerMessage fromServer = (ServerMessage) obj;
-                    processServerMessage(fromServer);
-                } else if (obj instanceof String) {
-                    String message = (String) obj;
-                    displayMessage(message);
-                } else if (obj instanceof Integer[]) {
-                    Integer[] points = (Integer[]) obj;
-                    displayPoints(points);
-                } else if (obj instanceof ArrayList) {
-                    // Kontrollera typer!
-                    ArrayList<List> lista = (ArrayList) obj;
-                    List<Integer> playerOneHistory = lista.get(0);
-                    List<Integer> playerTwoHistory = lista.get(1);
-                    /*String playerOneText = getScoreSummary("Spelare 1",
-                            playerOneHistory);
-                    String playerTwoText = getScoreSummary("Spelare 2",
-                            playerTwoHistory);
-                    JOptionPane.showMessageDialog(this, playerOneText + "\n\n" + playerTwoText);*/
-                    /*// TODO Ordna en riktig översikt
-                    System.out.println(playerOneHistory.toString());
-                    System.out.println(playerTwoHistory);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }*/
+    @FXML
+    public void initialize() throws IOException {
+        session = new ClientSession(this);
+    }
 
     synchronized void displayMessage(String msg) {
         messagePanel.setText(msg);
@@ -156,5 +122,10 @@ public class ClientFXController {
 
     void setCategoryDisable(boolean b) {
         categoryPanel.setDisable(b);
+    }
+
+    void setContinueDisable(boolean b) {
+        continueButton.setDisable(b);
+        continueButton.setVisible(!b);
     }
 }

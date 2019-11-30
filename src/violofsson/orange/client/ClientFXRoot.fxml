@@ -14,7 +14,8 @@
     <top>
         <HBox fx:id="categoryPanel">
             <ComboBox fx:id="categoryChooser"/>
-            <Button fx:id="categoryButton" text="Select" onAction="#chooseCategory"/>
+            <Button fx:id="categoryButton" text="Select"
+                    onAction="#chooseCategory"/>
         </HBox>
     </top>
     <left>
@@ -24,14 +25,18 @@
         <Text fx:id="playerTwo" text="P2: 0"/>
     </right>
     <center>
-        <TextArea fx:id="messagePanel" text="Message field" editable="false"/>
+        <VBox>
+            <TextArea fx:id="messagePanel" text="Message field" editable="false" wrapText="true"/>
+            <GridPane fx:id="buttonPanel" disable="true">
+                <Button onAction="#chooseAnswer" text="Button 1" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Button onAction="#chooseAnswer" text="Button 2" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Button onAction="#chooseAnswer" text="Button 3" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Button onAction="#chooseAnswer" text="Button 4" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            </GridPane>
+        </VBox>
     </center>
     <bottom>
-        <GridPane fx:id="buttonPanel">
-            <Button onAction="#chooseAnswer" text="Button 1" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <Button onAction="#chooseAnswer" text="Button 2" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-            <Button onAction="#chooseAnswer" text="Button 3" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <Button onAction="#chooseAnswer" text="Button 4" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-        </GridPane>
+        <Button fx:id="continueButton" onAction="#nextQuestion"
+                text="Continue" disable="true" visible="false"/>
     </bottom>
 </BorderPane>

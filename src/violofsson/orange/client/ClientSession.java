@@ -26,6 +26,7 @@ class ClientSession implements Runnable {
 
     @Override
     public void run() {
+        // TODO Ta reda på varför Platform.runLater behövs
         try {
             while (socket.isConnected()) {
                 Object obj = null;
@@ -57,9 +58,7 @@ class ClientSession implements Runnable {
                     System.out.println(playerTwoHistory);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
