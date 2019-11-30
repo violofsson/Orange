@@ -106,7 +106,7 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
-    public void displayMessage(String s) {
+    public void displayString(String s) {
         messageArea.setText("\n\n\n\n\n\n             " + s);
     }
 
@@ -115,18 +115,18 @@ public class SwingClient extends JFrame implements GenericClientController {
         if (message.HEADER == ServerMessage.Headers.WELCOME) {
             playerOne.setText("Player 1");
             playerTwo.setText("Player 2");
-            displayMessage(message.BODY);
+            displayString(message.BODY);
         } else if (message.HEADER == ServerMessage.Headers.WAIT) {
             disableAnswers(true);
             disableCategories(true);
-            displayMessage(message.BODY);
+            displayString(message.BODY);
         } else if (message.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
             String[] categories = message.BODY.split(";");
             for (int i = 0; i < categories.length && i < buttonPanel.getComponents().length; i++) {
                 JButton btn = (JButton) buttonPanel.getComponents()[i];
                 btn.setText(categories[i]);
             }
-            displayMessage("Choose category");
+            displayString("Choose category");
             disableAnswers(false);
         } else if (message.HEADER == ServerMessage.Headers.YOU_WIN) {
             showMessageDialog("You win!", "Congratulations!");
@@ -135,13 +135,13 @@ public class SwingClient extends JFrame implements GenericClientController {
         } else if (message.HEADER == ServerMessage.Headers.YOU_TIED) {
             showMessageDialog("You tied!", "How unexpected!");
         } else {
-            displayMessage(message.BODY);
+            displayString(message.BODY);
         }
     }
 
     @Override
     public void displayQuestion(Question q) {
-        displayMessage(q.getQuestion());
+        displayString(q.getQuestion());
         java.util.List<String> alt = q.getAlternatives();
         checkAnswer = (q::isRightAnswer);
         for (Component c : buttonPanel.getComponents()) {
@@ -153,13 +153,13 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
-    public void displayScores(Integer[] scores) {
+    public void displayCurrentScores(Integer[] scores) {
         playerOne.setText("P1 : " + scores[0]);
         playerTwo.setText("P2 : " + scores[1]);
     }
 
     @Override
-    public void displayScores(ArrayList<List<Integer>> scores) {
+    public void displayScoreHistory(ArrayList<List<Integer>> scores) {
         System.out.println(getScoreSummary("Player 1", scores.get(0)));
         System.out.println();
         System.out.println(getScoreSummary("Player 2", scores.get(1)));

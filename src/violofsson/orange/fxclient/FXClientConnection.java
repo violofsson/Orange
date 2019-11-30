@@ -24,7 +24,7 @@ class FXClientConnection extends ClientConnection implements GenericClientContro
     }
 
     @Override
-    public void displayMessage(String s) {
+    public void displayString(String s) {
         Platform.runLater(() -> controller.displayMessage(s));
     }
 
@@ -34,12 +34,12 @@ class FXClientConnection extends ClientConnection implements GenericClientContro
     }
 
     @Override
-    public void displayScores(Integer[] scores) {
+    public void displayCurrentScores(Integer[] scores) {
         Platform.runLater(() -> controller.displayPoints(scores));
     }
 
     @Override
-    public void displayScores(ArrayList<List<Integer>> scores) {
+    public void displayScoreHistory(ArrayList<List<Integer>> scores) {
         List<Integer> playerOneHistory = scores.get(0);
         List<Integer> playerTwoHistory = scores.get(1);
         System.out.println(playerOneHistory);

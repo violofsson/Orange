@@ -7,13 +7,13 @@ import java.util.List;
 public interface GenericClientController extends Runnable {
     void displayMessage(ServerMessage message);
 
-    void displayMessage(String s);
+    void displayString(String s);
 
     void displayQuestion(Question q);
 
-    void displayScores(Integer[] scores);
+    void displayCurrentScores(Integer[] scores);
 
-    void displayScores(ArrayList<List<Integer>> scores);
+    void displayScoreHistory(ArrayList<List<Integer>> scores);
 
     ClientConnection getConnection();
 
@@ -29,13 +29,13 @@ public interface GenericClientController extends Runnable {
                     displayMessage(fromServer);
                 } else if (obj instanceof String) {
                     String message = (String) obj;
-                    displayMessage(message);
+                    displayString(message);
                 } else if (obj instanceof Integer[]) {
                     Integer[] points = (Integer[]) obj;
-                    displayScores(points);
+                    displayCurrentScores(points);
                 } else if (obj instanceof ArrayList) {
                     ArrayList<List<Integer>> lista = (ArrayList<List<Integer>>) obj;
-                    displayScores(lista);
+                    displayScoreHistory(lista);
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
