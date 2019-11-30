@@ -251,4 +251,3 @@ public class SwingClient extends JFrame implements Runnable {
         }
     }
 }
-
