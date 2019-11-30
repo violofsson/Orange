@@ -1,7 +1,6 @@
 package violofsson.orange.client;
 
 import javafx.application.Application;
-import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,26 +20,13 @@ public class ClientFX extends Application {
 
     public void initRootLayout() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ClientFXRoot.fxml"));
-            Parent root = loader.load();
-            ClientFXController controller = loader.getController();
-            ClientSession session = controller.getSession();
-            // TODO Ta reda på hur det här ens fungerar
-            Task<Void> task = new Task<>() {
-                @Override
-                protected Void call() throws Exception {
-                    session.run();
-                    return null;
-                }
-            };
-            Thread t = new Thread(task);
-            t.setDaemon(true);
-            t.start();
+            Parent root = FXMLLoader.load(getClass()
+                    .getResource("ClientFXRoot.fxml"));
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException e) {
-            e.printStackTrace();;
+            e.printStackTrace();
         }
     }
 

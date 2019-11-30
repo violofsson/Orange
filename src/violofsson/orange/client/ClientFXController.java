@@ -1,5 +1,6 @@
 package violofsson.orange.client;
 
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -51,6 +52,17 @@ public class ClientFXController {
     @FXML
     public void initialize() throws IOException {
         session = new ClientSession(this);
+        // TODO Ta reda på hur det här ens fungerar
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                session.run();
+                return null;
+            }
+        };
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
     }
 
     synchronized void displayMessage(String msg) {
@@ -78,10 +90,6 @@ public class ClientFXController {
         dialog.setHeaderText(header);
         dialog.setContentText(content);
         return dialog;
-    }
-
-    ClientSession getSession() {
-        return session;
     }
 
     synchronized void processServerMessage(ServerMessage fromServer) {
