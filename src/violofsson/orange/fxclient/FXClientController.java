@@ -17,14 +17,22 @@ import java.io.IOException;
 import java.util.List;
 
 public class FXClientController {
-    @FXML HBox categoryPanel;
-    @FXML ComboBox<String> categoryChooser;
-    @FXML Button categoryButton;
-    @FXML Text playerOne;
-    @FXML Text playerTwo;
-    @FXML TextArea messagePanel;
-    @FXML GridPane buttonPanel;
-    @FXML Button continueButton;
+    @FXML
+    HBox categoryPanel;
+    @FXML
+    ComboBox<String> categoryChooser;
+    @FXML
+    Button categoryButton;
+    @FXML
+    Text playerOne;
+    @FXML
+    Text playerTwo;
+    @FXML
+    TextArea messagePanel;
+    @FXML
+    GridPane buttonPanel;
+    @FXML
+    Button continueButton;
 
     private FXClientSession session;
     private String chosenAnswer;
@@ -94,13 +102,9 @@ public class FXClientController {
 
     synchronized void processServerMessage(ServerMessage fromServer) {
         if (fromServer.HEADER == ServerMessage.Headers.WELCOME) {
-            if (fromServer.MESSAGE.contains("1")) {
-                playerOne.setText(fromServer.MESSAGE);
-                playerTwo.setText("Player 2");
-            } else {
-                playerTwo.setText(fromServer.MESSAGE);
-                playerOne.setText("Player 1");
-            }
+            playerOne.setText("Player 1");
+            playerTwo.setText("Player 2");
+            displayMessage(fromServer.MESSAGE);
         } else if (fromServer.HEADER == ServerMessage.Headers.WAIT) {
             setAnswersDisable(true);
             setCategoryDisable(true);
