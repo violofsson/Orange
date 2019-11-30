@@ -107,12 +107,17 @@ public class FXClientController {
             displayMessage(fromServer.MESSAGE);
         } else if (fromServer.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
             String[] categories = fromServer.MESSAGE.split(";");
-            categoryChooser.getItems().clear();
+            /*categoryChooser.getItems().clear();
             for (String s : categories) {
                 categoryChooser.getItems().add(s);
             }
-            setCategoryDisable(false);
+            setCategoryDisable(false);*/
+            for (int i = 0; i < categories.length && i < buttonPanel.getChildren().size(); i++) {
+                Button btn = (Button) buttonPanel.getChildren().get(i);
+                btn.setText(categories[i]);
+            }
             displayMessage("Choose category");
+            setAnswersDisable(false);
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_WIN) {
             getMessageDialog("You win!", "Congratulations!").showAndWait();
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_LOSE) {
