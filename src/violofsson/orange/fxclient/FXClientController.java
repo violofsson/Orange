@@ -34,7 +34,7 @@ public class FXClientController {
     @FXML
     Button continueButton;
 
-    private FXClientSession session;
+    private FXClientConnection connection;
     private String chosenAnswer;
 
     @FXML
@@ -48,23 +48,23 @@ public class FXClientController {
     void chooseCategory() {
         String chosen = categoryChooser.getSelectionModel().getSelectedItem();
         setCategoryDisable(true);
-        session.send(chosen);
+        connection.send(chosen);
     }
 
     @FXML
     void nextQuestion() {
         setContinueDisable(true);
-        session.send(chosenAnswer);
+        connection.send(chosenAnswer);
     }
 
     @FXML
     public void initialize() throws IOException {
-        session = new FXClientSession(this);
+        connection = new FXClientConnection(this);
         // TODO Ta reda på hur det här ens fungerar
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                session.run();
+                connection.run();
                 return null;
             }
         };
@@ -104,13 +104,13 @@ public class FXClientController {
         if (fromServer.HEADER == ServerMessage.Headers.WELCOME) {
             playerOne.setText("Player 1");
             playerTwo.setText("Player 2");
-            displayMessage(fromServer.MESSAGE);
+            displayMessage(fromServer.BODY);
         } else if (fromServer.HEADER == ServerMessage.Headers.WAIT) {
             setAnswersDisable(true);
             setCategoryDisable(true);
-            displayMessage(fromServer.MESSAGE);
+            displayMessage(fromServer.BODY);
         } else if (fromServer.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
-            String[] categories = fromServer.MESSAGE.split(";");
+            String[] categories = fromServer.BODY.split(";");
             /*categoryChooser.getItems().clear();
             for (String s : categories) {
                 categoryChooser.getItems().add(s);
@@ -129,7 +129,7 @@ public class FXClientController {
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_TIED) {
             getMessageDialog("You tied!", "How unexpected!").showAndWait();
         } else {
-            displayMessage(fromServer.MESSAGE);
+            displayMessage(fromServer.BODY);
         }
     }
 

@@ -15,10 +15,10 @@ public class ServerMessage implements Serializable {
     }
 
     public final Headers HEADER;
-    public final String MESSAGE;
+    public final String BODY;
 
     public ServerMessage(Headers header, String message) {
         this.HEADER = header;
-        this.MESSAGE = message;
+        this.BODY = message;
     }
 }
