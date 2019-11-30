@@ -29,7 +29,7 @@ class ClientSession implements Runnable {
         // TODO Ta reda på varför Platform.runLater behövs
         try {
             while (socket.isConnected()) {
-                Object obj = null;
+                Object obj;
                 obj = receive();
                 if (obj instanceof Question) {
                     Question question = (Question) obj;

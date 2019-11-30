@@ -16,6 +16,8 @@ public class ServerSideGame extends Thread {
     }
 
     private Database db = new Database();
+    private ServerSidePlayer playerOne;
+    private ServerSidePlayer playerTwo;
     private ServerSidePlayer currentPlayer;
     private List<Question> questions;
     private int questionsPerRound;
@@ -33,90 +35,39 @@ public class ServerSideGame extends Thread {
         try {
             while (true) {
                 if (currentState == States.SELECTING_CATEGORY) {
-                    currentPlayer.getOpponent().sendMessage(
+                    currentOpponent().sendMessage(
                             ServerMessage.Headers.WAIT,
                             "Wait until other player chooses a category!");
-                    choosingCategory();
+                    selectNewCategory();
                     currentState = States.ASKING_QUESTIONS;
-                    currentPlayer.getOpponent().sendMessage(
+                    currentOpponent().sendMessage(
                             ServerMessage.Headers.WAIT,
                             "Wait until other player answer");
                 } else if (currentState == States.ASKING_QUESTIONS) {
                     handleQuestions();
                     currentState = States.SWITCH_PLAYER;
                 } else if (currentState == States.SWITCH_PLAYER) {
-                    switchingPlayer();
+                    switchPlayer();
                 } else if (currentState == States.ALL_QUESTIONS_ANSWERED) {
-                    sendPoints();
-                    sendPointsHistory();
+                    sendScore();
+                    sendScoreHistory();
                     hasWinner();
                     resetGame();
                 }
-            }//While
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }//run
-
-    private void resetGame() throws IOException {
-        if (isGameOver()) {
-            currentPlayer.totPoints = 0;
-            currentPlayer.getOpponent().totPoints = 0;
-            currentRound = currentRound % totalRounds;
-            sendPoints();
-        }
     }
 
-    void setPlayers(ServerSidePlayer playerOne, ServerSidePlayer playerTwo) {
-        playerOne.setOpponent(playerTwo);
-        playerTwo.setOpponent(playerOne);
-        currentPlayer = playerOne;
+    // TODO Avgör vilka metoder som faktiskt behöver vara synchronized
+
+    private boolean allQuestionsAnswered() {
+        return currentPlayer.questionNumber == questionsPerRound;
     }
 
-    private ServerSidePlayer getPlayerOne() {
-        if (currentPlayer.name.equalsIgnoreCase("Player 1")) {
-            return currentPlayer;
-        } else {
-            return currentPlayer.getOpponent();
-        }
-    }
-
-    private ServerSidePlayer getPlayerTwo() {
-        return getPlayerOne().getOpponent();
-    }
-
-    private void sendPointsHistory() throws IOException {
-        ArrayList<List> histories = new ArrayList<>();
-        histories.add(getPlayerOne().scoreHistory);
-        histories.add(getPlayerTwo().scoreHistory);
-
-        getPlayerOne().sendObject(histories);
-        getPlayerTwo().sendObject(histories);
-    }
-
-    private void sendPoints() throws IOException {
-        Integer[] points = {getPlayerOne().totPoints, getPlayerTwo().totPoints};
-        getPlayerOne().sendObject(points);
-        getPlayerTwo().sendObject(points);
-        currentState = States.SELECTING_CATEGORY;
-    }
-
-    private void switchingPlayer() throws IOException {
-        if (isRoundOver()) {
-            currentState = States.ALL_QUESTIONS_ANSWERED;
-        } else {
-            switchPlayer();
-            currentPlayer.getOpponent().sendMessage(ServerMessage.Headers.WAIT,
-                    "Wait for the opponent");
-            currentState = States.ASKING_QUESTIONS;
-        }
-    }
-
-    private void choosingCategory() throws IOException {
-        currentPlayer.sendMessage(ServerMessage.Headers.CHOOSE_CATEGORY,
-                db.getCategoryString());
-        String category = currentPlayer.readLine();
-        selectCategory(category);
+    private ServerSidePlayer currentOpponent() {
+        return (currentPlayer == playerOne) ? playerTwo : playerOne;
     }
 
     private void handleQuestions() throws IOException {
@@ -131,64 +82,101 @@ public class ServerSideGame extends Thread {
                 currentPlayer.totPoints++;
                 tempScore++;
             }
-            nextQuestion();// index ökar med 1
+            nextQuestion();
         }
         currentPlayer.scoreHistory.add(tempScore);
     }
 
-    private void hasWinner() throws IOException {
+    private synchronized void hasWinner() throws IOException {
         if (isGameOver()) {
-            if (currentPlayer.totPoints > currentPlayer.getOpponent().totPoints) {
-                currentPlayer.sendMessage(
+            if (playerOne.totPoints > playerTwo.totPoints) {
+                playerOne.sendMessage(
                         ServerMessage.Headers.YOU_WIN, "YOU WIN");
-                currentPlayer.getOpponent().sendMessage(
+                playerTwo.sendMessage(
                         ServerMessage.Headers.YOU_LOSE, "YOU LOSE");
-            } else if (currentPlayer.totPoints < currentPlayer.getOpponent().totPoints) {
-                currentPlayer.sendMessage(
+            } else if (playerOne.totPoints < playerTwo.totPoints) {
+                playerOne.sendMessage(
                         ServerMessage.Headers.YOU_LOSE, "YOU LOSE");
-                currentPlayer.getOpponent().sendMessage(
+                playerTwo.sendMessage(
                         ServerMessage.Headers.YOU_WIN, "YOU WIN");
             } else {
-                currentPlayer.sendMessage(
+                playerOne.sendMessage(
                         ServerMessage.Headers.YOU_TIED, "YOU TIED");
-                currentPlayer.getOpponent().sendMessage(
+                playerTwo.sendMessage(
                         ServerMessage.Headers.YOU_TIED, "YOU TIED");
             }
         }
     }
 
-    private synchronized boolean isRoundOver() {
-        if (currentPlayer.questionNumber == questionsPerRound
-                && currentPlayer.getOpponent().questionNumber == questionsPerRound) {
+    private boolean isGameOver() {
+        return currentRound == totalRounds;
+    }
+
+    private boolean isRoundOver() {
+        if (playerOne.questionNumber == questionsPerRound
+                && playerTwo.questionNumber == questionsPerRound) {
             // nollställer om rundan är över (Problemet är att det finns risk för
             //  att man kan få samma fråga igen om man väljer samma kategori)
             // en annan lösning är att man endast nollställer om questionNumber når list.size()
-            currentPlayer.questionNumber = 0;
-            currentPlayer.getOpponent().questionNumber = 0;
+            playerOne.questionNumber = 0;
+            playerTwo.questionNumber = 0;
             return true;
         } else {
             return false;
         }
     }
 
-    private synchronized boolean isGameOver() {
-        return currentRound == totalRounds;
-    }
-
-    private synchronized void switchPlayer() {
-        currentPlayer = currentPlayer.getOpponent();
-    }
-
-    private synchronized boolean allQuestionsAnswered() {
-        return currentPlayer.questionNumber == questionsPerRound;
-    }
-
-    private synchronized void nextQuestion() {
+    private void nextQuestion() {
         currentPlayer.questionNumber++;
     }
 
-    private synchronized void selectCategory(String categoryName) {
-        questions = db.getQuestions(categoryName, questionsPerRound);
+    private synchronized void resetGame() throws IOException {
+        if (isGameOver()) {
+            playerOne.totPoints = 0;
+            playerTwo.totPoints = 0;
+            currentRound = currentRound % totalRounds;
+            sendScore();
+        }
+    }
+
+    private synchronized void selectNewCategory() throws IOException {
+        currentPlayer.sendMessage(ServerMessage.Headers.CHOOSE_CATEGORY,
+                db.getCategoryString());
+        String category = currentPlayer.readLine();
+        questions = db.getQuestions(category, questionsPerRound);
         currentRound++;
+    }
+
+    private synchronized void sendScore() throws IOException {
+        Integer[] score = {playerOne.totPoints, playerTwo.totPoints};
+        playerOne.sendObject(score);
+        playerTwo.sendObject(score);
+        currentState = States.SELECTING_CATEGORY;
+    }
+
+    private synchronized void sendScoreHistory() throws IOException {
+        ArrayList<List<Integer>> histories = new ArrayList<>();
+        histories.add(playerOne.scoreHistory);
+        histories.add(playerTwo.scoreHistory);
+
+        playerOne.sendObject(histories);
+        playerTwo.sendObject(histories);
+    }
+
+    void setPlayers(ServerSidePlayer playerOne, ServerSidePlayer playerTwo) {
+        this.playerOne = playerOne;
+        this.playerTwo = playerTwo;
+        currentPlayer = playerOne;
+    }
+
+    private synchronized void switchPlayer() throws IOException {
+        if (isRoundOver()) {
+            currentState = States.ALL_QUESTIONS_ANSWERED;
+        } else {
+            currentPlayer.sendMessage(ServerMessage.Headers.WAIT,
+                    "Wait for the opponent");
+            currentPlayer = currentOpponent();
+            currentState = States.ASKING_QUESTIONS;
+        }
     }
 }

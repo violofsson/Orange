@@ -16,10 +16,10 @@ public class Question implements Serializable {
         this.rightAnswer = rightAnswer;
         alternatives.add(rightAnswer);
         alternatives.addAll(wrongAnswers);
+        Collections.shuffle(alternatives);
     }
 
     public List<String> getAlternatives() {
-        Collections.shuffle(alternatives);
         return alternatives;
     }
 

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ServerSidePlayer {
-    private ServerSidePlayer opponent;
     int totPoints = 0;
     int questionNumber = 0;
     String name;
@@ -20,7 +19,6 @@ class ServerSidePlayer {
 
     ServerSidePlayer(Socket socket, String name) {
         this.name = name;
-
         try {
             outputObject = new ObjectOutputStream(socket.getOutputStream());
             input = new BufferedReader(new InputStreamReader(
@@ -32,16 +30,8 @@ class ServerSidePlayer {
         }
     }
 
-    ServerSidePlayer getOpponent() {
-        return this.opponent;
-    }
-
     String readLine() throws IOException {
         return input.readLine();
-    }
-
-    void setOpponent(ServerSidePlayer opponent) {
-        this.opponent = opponent;
     }
 
     void sendMessage(ServerMessage.Headers header, String message) throws IOException {

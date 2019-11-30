@@ -26,7 +26,7 @@ public class ClientFX extends Application {
             ClientFXController controller = loader.getController();
             ClientSession session = controller.getSession();
             // TODO Ta reda på hur det här ens fungerar
-            Task task = new Task<Void>() {
+            Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
                     session.run();

@@ -72,9 +72,9 @@ public class ClientFXController {
         setAnswersDisable(false);
     }
 
-    private Alert getMessageDialog(String title, String header, String content) {
+    private Alert getMessageDialog(String header, String content) {
         Alert dialog = new Alert(Alert.AlertType.INFORMATION);
-        dialog.setTitle(title);
+        dialog.setTitle(null);
         dialog.setHeaderText(header);
         dialog.setContentText(content);
         return dialog;
@@ -106,11 +106,11 @@ public class ClientFXController {
             setCategoryDisable(false);
             displayMessage("Choose category");
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_WIN) {
-            getMessageDialog(null, "You win!", "Congratulations!").showAndWait();
+            getMessageDialog("You win!", "Congratulations!").showAndWait();
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_LOSE) {
-            getMessageDialog(null, "You lose!", "Too bad!").showAndWait();
+            getMessageDialog("You lose!", "Too bad!").showAndWait();
         } else if (fromServer.HEADER == ServerMessage.Headers.YOU_TIED) {
-            getMessageDialog(null, "You tied!", "How unexpected!").showAndWait();
+            getMessageDialog("You tied!", "How unexpected!").showAndWait();
         } else {
             displayMessage(fromServer.MESSAGE);
         }
