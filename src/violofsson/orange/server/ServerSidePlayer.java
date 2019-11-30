@@ -23,8 +23,8 @@ class ServerSidePlayer {
             outputObject = new ObjectOutputStream(socket.getOutputStream());
             input = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
-            outputObject.writeObject("Welcome: "+name);
-            outputObject.writeObject("Wait until the other player is connected!");
+            sendMessage(ServerMessage.Headers.WELCOME, "Welcome " + name);
+            sendMessage(ServerMessage.Headers.WAIT, "Wait until the other player is connected!");
         } catch (IOException e) {
             e.printStackTrace();
         }
