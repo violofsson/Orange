@@ -1,10 +1,7 @@
 package violofsson.orange.fxclient;
 
 import javafx.application.Platform;
-import violofsson.orange.protocol.ClientConnection;
-import violofsson.orange.protocol.GenericClientController;
-import violofsson.orange.protocol.Question;
-import violofsson.orange.protocol.ServerMessage;
+import violofsson.orange.protocol.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
