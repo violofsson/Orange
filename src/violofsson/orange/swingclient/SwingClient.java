@@ -24,6 +24,15 @@ public class SwingClient extends JFrame implements GenericClientController {
     private JLabel playerTwo = new JLabel("s2");
     private JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
 
+    private String userAnswer;
+    private ActionListener continueButtonListener = e -> {
+        disableContinue(true);
+        for (JButton button : buttons) {
+            button.setBackground(Color.BLACK);
+        }
+        getConnection().send(userAnswer);
+    };
+
     private Function<String, Boolean> checkAnswer;
 
     public SwingClient() throws IOException {
@@ -215,15 +224,6 @@ public class SwingClient extends JFrame implements GenericClientController {
         JOptionPane.showMessageDialog(this, content, title,
                 JOptionPane.INFORMATION_MESSAGE);
     }
-
-    private String userAnswer;
-    private ActionListener continueButtonListener = e -> {
-        disableContinue(true);
-        for (JButton button : buttons) {
-            button.setBackground(Color.BLACK);
-        }
-        getConnection().send(userAnswer);
-    };
 
     public static void main(String[] args) {
         try {
