@@ -114,7 +114,14 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
-    public void displayCategories(String[] categories) {}
+    public void displayCategories(String[] categories) {
+        for (int i = 0; i < categories.length && i < buttonPanel.getComponents().length; i++) {
+            JButton btn = (JButton) buttonPanel.getComponents()[i];
+            btn.setText(categories[i]);
+        }
+        displayString("Choose category");
+        disableAnswers(false);
+    }
 
     @Override
     public void displayString(String s) {
@@ -122,32 +129,8 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
-    public void displayMessage(ServerMessage message) {
-        if (message.header == ServerMessage.Headers.WELCOME) {
-            playerOne.setText("Player 1");
-            playerTwo.setText("Player 2");
-            displayString(message.body);
-        } else if (message.header == ServerMessage.Headers.WAIT) {
-            disableAnswers(true);
-            disableCategories(true);
-            displayString(message.body);
-        } else if (message.header == ServerMessage.Headers.CHOOSE_CATEGORY) {
-            String[] categories = message.body.split(";");
-            for (int i = 0; i < categories.length && i < buttonPanel.getComponents().length; i++) {
-                JButton btn = (JButton) buttonPanel.getComponents()[i];
-                btn.setText(categories[i]);
-            }
-            displayString("Choose category");
-            disableAnswers(false);
-        } else if (message.header == ServerMessage.Headers.YOU_WIN) {
-            showMessageDialog("You win!", "Congratulations!");
-        } else if (message.header == ServerMessage.Headers.YOU_LOSE) {
-            showMessageDialog("You lose!", "Too bad!");
-        } else if (message.header == ServerMessage.Headers.YOU_TIED) {
-            showMessageDialog("You tied!", "How unexpected!");
-        } else {
-            displayString(message.body);
-        }
+    public void displayServerMessage(ServerMessage message) {
+        displayString(message.body);
     }
 
     @Override
@@ -177,8 +160,34 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
+    public void displayWinLossTie(ServerMessage message) {
+        if (message.header == ServerMessage.Headers.YOU_WIN) {
+            showMessageDialog("You win!", "Congratulations!");
+        } else if (message.header == ServerMessage.Headers.YOU_LOSE) {
+            showMessageDialog("You lose!", "Too bad!");
+        } else if (message.header == ServerMessage.Headers.YOU_TIED) {
+            showMessageDialog("You tied!", "How unexpected!");
+        }
+        // Vad göra om annat meddelande?
+    }
+
+    @Override
     public ClientConnection getConnection() {
         return connection;
+    }
+
+    @Override
+    public void setWaiting(String waitMessage) {
+        disableAnswers(true);
+        disableCategories(true);
+        displayString(waitMessage);
+    }
+
+    @Override
+    public void welcomePlayer(String welcomeMessage) {
+        playerOne.setText("Player 1");
+        playerTwo.setText("Player 2");
+        displayString(welcomeMessage);
     }
 
     private void changeButtonColors(String answer) {

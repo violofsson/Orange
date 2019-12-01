@@ -15,11 +15,13 @@ class FXClientConnection extends ClientConnection implements GenericClientContro
     }
 
     @Override
-    public void displayCategories(String[] categories) {}
+    public void displayCategories(String[] categories) {
+        Platform.runLater(() -> controller.presentCategories(categories));
+    }
 
     @Override
-    public void displayMessage(ServerMessage message) {
-        Platform.runLater(() -> controller.processServerMessage(message));
+    public void displayServerMessage(ServerMessage message) {
+        Platform.runLater(() -> controller.displayMessage(message.body));
     }
 
     @Override
@@ -46,7 +48,22 @@ class FXClientConnection extends ClientConnection implements GenericClientContro
     }
 
     @Override
+    public void displayWinLossTie(ServerMessage message) {
+        Platform.runLater(() -> controller.showEndMessage(message));
+    }
+
+    @Override
     public ClientConnection getConnection() {
         return this;
+    }
+
+    @Override
+    public void setWaiting(String waitingMessage) {
+        Platform.runLater(() -> controller.wait(waitingMessage));
+    }
+
+    @Override
+    public void welcomePlayer(String welcomeMessage) {
+        Platform.runLater(() -> controller.displayWelcome(welcomeMessage));
     }
 }

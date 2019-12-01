@@ -92,6 +92,12 @@ public class FXClientController {
         setAnswersDisable(false);
     }
 
+    synchronized void displayWelcome(String welcomeMessage) {
+        playerOne.setText("Player 1");
+        playerTwo.setText("Player 2");
+        displayMessage(welcomeMessage);
+    }
+
     private Alert getMessageDialog(String header, String content) {
         Alert dialog = new Alert(Alert.AlertType.INFORMATION);
         dialog.setTitle(null);
@@ -100,37 +106,18 @@ public class FXClientController {
         return dialog;
     }
 
-    synchronized void processServerMessage(ServerMessage fromServer) {
-        if (fromServer.header == ServerMessage.Headers.WELCOME) {
-            playerOne.setText("Player 1");
-            playerTwo.setText("Player 2");
-            displayMessage(fromServer.body);
-        } else if (fromServer.header == ServerMessage.Headers.WAIT) {
-            setAnswersDisable(true);
-            setCategoryDisable(true);
-            displayMessage(fromServer.body);
-        } else if (fromServer.header == ServerMessage.Headers.CHOOSE_CATEGORY) {
-            String[] categories = fromServer.body.split(";");
-            /*categoryChooser.getItems().clear();
+    synchronized void presentCategories(String[] categories) {
+        /*categoryChooser.getItems().clear();
             for (String s : categories) {
                 categoryChooser.getItems().add(s);
             }
             setCategoryDisable(false);*/
-            for (int i = 0; i < categories.length && i < buttonPanel.getChildren().size(); i++) {
-                Button btn = (Button) buttonPanel.getChildren().get(i);
-                btn.setText(categories[i]);
-            }
-            displayMessage("Choose category");
-            setAnswersDisable(false);
-        } else if (fromServer.header == ServerMessage.Headers.YOU_WIN) {
-            getMessageDialog("You win!", "Congratulations!").showAndWait();
-        } else if (fromServer.header == ServerMessage.Headers.YOU_LOSE) {
-            getMessageDialog("You lose!", "Too bad!").showAndWait();
-        } else if (fromServer.header == ServerMessage.Headers.YOU_TIED) {
-            getMessageDialog("You tied!", "How unexpected!").showAndWait();
-        } else {
-            displayMessage(fromServer.body);
+        for (int i = 0; i < categories.length && i < buttonPanel.getChildren().size(); i++) {
+            Button btn = (Button) buttonPanel.getChildren().get(i);
+            btn.setText(categories[i]);
         }
+        displayMessage("Choose category");
+        setAnswersDisable(false);
     }
 
     void setAnswersDisable(boolean b) {
@@ -144,5 +131,25 @@ public class FXClientController {
     void setContinueDisable(boolean b) {
         continueButton.setDisable(b);
         continueButton.setVisible(!b);
+    }
+
+    synchronized void showEndMessage(ServerMessage message) {
+        Alert dialog;
+        if (message.header == ServerMessage.Headers.YOU_WIN) {
+            dialog = getMessageDialog("You win!", "Congratulations!");
+        } else if (message.header == ServerMessage.Headers.YOU_LOSE) {
+            dialog = getMessageDialog("You lose!", "Too bad!");
+        } else if (message.header == ServerMessage.Headers.YOU_TIED) {
+            dialog = getMessageDialog("You tied!", "How unexpected!");
+        } else {
+            dialog = getMessageDialog("ERROR", "Something went wrong!");
+        }
+        dialog.showAndWait();
+    }
+
+    synchronized void wait(String waitingMessage) {
+        setAnswersDisable(true);
+        setCategoryDisable(true);
+        displayMessage(waitingMessage);
     }
 }
