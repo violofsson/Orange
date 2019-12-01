@@ -4,7 +4,6 @@ import violofsson.orange.protocol.Question;
 import violofsson.orange.protocol.ServerMessage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServerSideGame extends Thread {
@@ -16,12 +15,9 @@ public class ServerSideGame extends Thread {
     }
 
     private Database db = new Database();
-    private ServerSidePlayer playerOne;
-    private ServerSidePlayer playerTwo;
-    private ServerSidePlayer currentPlayer;
+    private ServerSidePlayer playerOne, playerTwo, currentPlayer;
     private List<Question> questions;
-    private int questionsPerRound;
-    private int totalRounds;
+    private int questionsPerRound, totalRounds;
     private int currentRound = 0;
     private States currentState = States.SELECTING_CATEGORY;
 
@@ -115,9 +111,6 @@ public class ServerSideGame extends Thread {
     private boolean isRoundOver() {
         if (playerOne.questionNumber == questionsPerRound
                 && playerTwo.questionNumber == questionsPerRound) {
-            // nollställer om rundan är över (Problemet är att det finns risk för
-            //  att man kan få samma fråga igen om man väljer samma kategori)
-            // en annan lösning är att man endast nollställer om questionNumber når list.size()
             playerOne.questionNumber = 0;
             playerTwo.questionNumber = 0;
             return true;
@@ -141,26 +134,29 @@ public class ServerSideGame extends Thread {
 
     private synchronized void selectNewCategory() throws IOException {
         currentPlayer.sendMessage(ServerMessage.Headers.CHOOSE_CATEGORY,
-                db.getCategoryString());
-        String category = currentPlayer.readLine();
-        questions = db.getQuestions(category, questionsPerRound);
+                ServerMessage.encodeStringList(db.getRandomCategories(4)));
+        String selectedCategory = currentPlayer.readLine();
+        questions = db.getQuestions(selectedCategory, questionsPerRound);
         currentRound++;
     }
 
     private synchronized void sendScore() throws IOException {
-        Integer[] score = {playerOne.totPoints, playerTwo.totPoints};
-        playerOne.sendObject(score);
-        playerTwo.sendObject(score);
+        ServerMessage msg = new ServerMessage(
+                ServerMessage.Headers.CURRENT_SCORE,
+                ServerMessage.encodeCurrentScores(
+                        playerOne.totPoints, playerTwo.totPoints));
+        playerOne.sendMessage(msg);
+        playerTwo.sendMessage(msg);
         currentState = States.SELECTING_CATEGORY;
     }
 
     private synchronized void sendScoreHistory() throws IOException {
-        ArrayList<List<Integer>> histories = new ArrayList<>();
-        histories.add(playerOne.scoreHistory);
-        histories.add(playerTwo.scoreHistory);
-
-        playerOne.sendObject(histories);
-        playerTwo.sendObject(histories);
+        ServerMessage msg = new ServerMessage(
+                ServerMessage.Headers.SCORE_HISTORY,
+                ServerMessage.encodeScoreHistories(
+                        playerOne.scoreHistory, playerTwo.scoreHistory));
+        playerOne.sendMessage(msg);
+        playerTwo.sendMessage(msg);
     }
 
     void setPlayers(ServerSidePlayer playerOne, ServerSidePlayer playerTwo) {

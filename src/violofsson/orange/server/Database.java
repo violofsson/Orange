@@ -79,16 +79,6 @@ class Database {
         }
     }
 
-    private List<String> getRandomCategories(int wantedCategories) {
-        // TODO Tomma och/eller stora listor
-        if (wantedCategories >= categoryIDs.size()) {
-            wantedCategories = categoryIDs.size();
-        }
-        List<String> categories = new ArrayList<>(categoryIDs.keySet());
-        Collections.shuffle(categories);
-        return categories.subList(0, wantedCategories);
-    }
-
     List<Question> getQuestions(String wantedCategory,
                                 int numberOfQuestions) {
         try {
@@ -110,6 +100,16 @@ class Database {
         }
     }
 
+    List<String> getRandomCategories(int wantedCategories) {
+        // TODO Tomma och/eller stora listor
+        if (wantedCategories > categoryIDs.size()) {
+            wantedCategories = categoryIDs.size();
+        }
+        List<String> categories = new ArrayList<>(categoryIDs.keySet());
+        Collections.shuffle(categories);
+        return categories.subList(0, wantedCategories);
+    }
+
     private void loadCategories() throws IOException {
         URL categoryURL = new URL("https://opentdb.com/api_category.php");
         CategoryAPICall catCall = deserializer.fromJson(
@@ -119,9 +119,5 @@ class Database {
                 .collect(Collectors.toMap(
                         c -> URLDecoder.decode(c.name, StandardCharsets.UTF_8),
                         c -> c.id));
-    }
-
-    String getCategoryString() {
-        return String.join(";", getRandomCategories(4));
     }
 }

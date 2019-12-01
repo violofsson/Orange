@@ -1,6 +1,9 @@
 package violofsson.orange.swingclient;
 
-import violofsson.orange.protocol.*;
+import violofsson.orange.protocol.ClientConnection;
+import violofsson.orange.protocol.GenericClientController;
+import violofsson.orange.protocol.Question;
+import violofsson.orange.protocol.ServerMessage;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,7 +11,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Function;
 
 public class SwingClient extends JFrame implements GenericClientController {
     private ClientConnection connection;
@@ -24,6 +26,7 @@ public class SwingClient extends JFrame implements GenericClientController {
     private JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
 
     private String userAnswer;
+    //private Function<String, Boolean> checkAnswer;
     private ActionListener continueButtonListener = e -> {
         disableContinue(true);
         for (JButton button : buttons) {
@@ -31,9 +34,6 @@ public class SwingClient extends JFrame implements GenericClientController {
         }
         getConnection().send(userAnswer);
     };
-
-    private Function<String, Boolean> checkAnswer;
-
     public SwingClient() throws IOException {
         connection = new ClientConnection();
 
@@ -137,7 +137,7 @@ public class SwingClient extends JFrame implements GenericClientController {
     public void displayQuestion(Question q) {
         displayString(q.getQuestion());
         java.util.List<String> alt = q.getAlternatives();
-        checkAnswer = (q::isRightAnswer);
+        //checkAnswer = (q::isRightAnswer);
         for (Component c : buttonPanel.getComponents()) {
             c.setEnabled(true);
         }
@@ -190,7 +190,7 @@ public class SwingClient extends JFrame implements GenericClientController {
         displayString(welcomeMessage);
     }
 
-    private void changeButtonColors(String answer) {
+    /*private void changeButtonColors(String answer) {
         for (JButton b : buttons) {
             if (b.getText().equals(answer)
                     && !checkAnswer.apply(b.getText())) {
@@ -201,7 +201,7 @@ public class SwingClient extends JFrame implements GenericClientController {
                 b.setOpaque(true);
             }
         }
-    }
+    }*/
 
     void disableAnswers(boolean b) {
         for (Component c : buttonPanel.getComponents()) {

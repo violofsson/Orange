@@ -6,13 +6,12 @@ import java.net.ServerSocket;
 import java.util.Properties;
 
 public class Server {
-
     public static void main(String[] args) throws IOException {
         ServerSocket listener = null;
         try {
             listener = new ServerSocket(56565);
         } catch (IOException e) {
-            System.err.println("Server is not working");
+            System.err.println("Server is not working!");
             e.printStackTrace();
         }
 

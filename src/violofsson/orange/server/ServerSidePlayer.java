@@ -12,7 +12,7 @@ class ServerSidePlayer {
     int totPoints = 0;
     int questionNumber = 0;
     String name;
-    List <Integer> scoreHistory = new ArrayList<>();
+    List<Integer> scoreHistory = new ArrayList<>();
 
     private BufferedReader input;
     private ObjectOutputStream outputObject;
@@ -34,14 +34,14 @@ class ServerSidePlayer {
         return input.readLine();
     }
 
+    void sendMessage(ServerMessage message) throws IOException {
+        outputObject.reset();
+        outputObject.writeObject(message);
+    }
+
     void sendMessage(ServerMessage.Headers header, String message) throws IOException {
         outputObject.reset();
         outputObject.writeObject(new ServerMessage(header, message));
-    }
-
-    void sendObject(Object obj) throws IOException {
-        outputObject.reset();
-        outputObject.writeObject(obj);
     }
 
     void sendQuestion(Question q) throws IOException {

@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ServerMessage implements Serializable {
-    static final String DELIMITER=";";
-
     public enum Headers {
         WELCOME,
         WAIT,
@@ -24,17 +23,14 @@ public class ServerMessage implements Serializable {
 
     public final Headers header;
     public final String body;
+    static final String DELIMITER=";";
 
     public ServerMessage(Headers header, String body) {
         this.header = header;
         this.body = body;
     }
 
-    public static String[] parseCategories(String s) {
-        return s.split(DELIMITER);
-    }
-
-    public static Integer[] parseCurrentScores(String s) {
+    public static Integer[] decodeCurrentScores(String s) {
         String[] array = s.split(DELIMITER);
         Integer[] scores = new Integer[array.length];
         for (int i = 0; i < array.length; i++) {
@@ -43,7 +39,7 @@ public class ServerMessage implements Serializable {
         return scores;
     }
 
-    public static List<List<Integer>> parseScoreHistory(String s) {
+    public static List<List<Integer>> decodeScoreHistory(String s) {
         List<Integer> integers = Arrays.stream(s.split(DELIMITER))
                 .mapToInt(Integer::parseInt).boxed()
                 .collect(Collectors.toList());
@@ -51,5 +47,23 @@ public class ServerMessage implements Serializable {
         result.add(integers.subList(0, integers.size()/2));
         result.add(integers.subList(integers.size()/2, integers.size()));
         return result;
+    }
+
+    public static String[] decodeStringList(String s) {
+        return s.split(DELIMITER);
+    }
+
+    public static String encodeCurrentScores(int playerOne, int playerTwo) {
+        return playerOne + DELIMITER + playerTwo;
+    }
+
+    public static String encodeScoreHistories(List<Integer> playerOne, List<Integer> playerTwo) {
+        return Stream.concat(playerOne.stream(), playerTwo.stream())
+                .map(Object::toString)
+                .collect(Collectors.joining(ServerMessage.DELIMITER));
+    }
+
+    public static String encodeStringList(List<String> list) {
+        return String.join(DELIMITER, list);
     }
 }

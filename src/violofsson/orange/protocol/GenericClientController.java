@@ -34,7 +34,7 @@ public interface GenericClientController extends Runnable {
         } else if (message.header == WAIT) {
             setWaiting(message.body);
         } else if (message.header == CHOOSE_CATEGORY) {
-            displayCategories(ServerMessage.parseCategories(message.body));
+            displayCategories(ServerMessage.decodeStringList(message.body));
             /*} else if (message.header == QUESTION) {
 
              */
@@ -43,9 +43,9 @@ public interface GenericClientController extends Runnable {
                 || message.header == YOU_TIED) {
             displayWinLossTie(message);
         } else if (message.header == CURRENT_SCORE) {
-            displayCurrentScores(ServerMessage.parseCurrentScores(message.body));
+            displayCurrentScores(ServerMessage.decodeCurrentScores(message.body));
         } else if (message.header == SCORE_HISTORY) {
-            displayScoreHistory(ServerMessage.parseScoreHistory(message.body));
+            displayScoreHistory(ServerMessage.decodeScoreHistory(message.body));
         } else {
             displayServerMessage(message);
         }
