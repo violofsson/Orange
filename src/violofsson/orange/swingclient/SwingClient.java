@@ -7,7 +7,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -115,36 +114,39 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
+    public void displayCategories(String[] categories) {}
+
+    @Override
     public void displayString(String s) {
         messageArea.setText("\n\n\n\n\n\n             " + s);
     }
 
     @Override
     public void displayMessage(ServerMessage message) {
-        if (message.HEADER == ServerMessage.Headers.WELCOME) {
+        if (message.header == ServerMessage.Headers.WELCOME) {
             playerOne.setText("Player 1");
             playerTwo.setText("Player 2");
-            displayString(message.BODY);
-        } else if (message.HEADER == ServerMessage.Headers.WAIT) {
+            displayString(message.body);
+        } else if (message.header == ServerMessage.Headers.WAIT) {
             disableAnswers(true);
             disableCategories(true);
-            displayString(message.BODY);
-        } else if (message.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
-            String[] categories = message.BODY.split(";");
+            displayString(message.body);
+        } else if (message.header == ServerMessage.Headers.CHOOSE_CATEGORY) {
+            String[] categories = message.body.split(";");
             for (int i = 0; i < categories.length && i < buttonPanel.getComponents().length; i++) {
                 JButton btn = (JButton) buttonPanel.getComponents()[i];
                 btn.setText(categories[i]);
             }
             displayString("Choose category");
             disableAnswers(false);
-        } else if (message.HEADER == ServerMessage.Headers.YOU_WIN) {
+        } else if (message.header == ServerMessage.Headers.YOU_WIN) {
             showMessageDialog("You win!", "Congratulations!");
-        } else if (message.HEADER == ServerMessage.Headers.YOU_LOSE) {
+        } else if (message.header == ServerMessage.Headers.YOU_LOSE) {
             showMessageDialog("You lose!", "Too bad!");
-        } else if (message.HEADER == ServerMessage.Headers.YOU_TIED) {
+        } else if (message.header == ServerMessage.Headers.YOU_TIED) {
             showMessageDialog("You tied!", "How unexpected!");
         } else {
-            displayString(message.BODY);
+            displayString(message.body);
         }
     }
 
@@ -168,7 +170,7 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
-    public void displayScoreHistory(ArrayList<List<Integer>> scores) {
+    public void displayScoreHistory(List<List<Integer>> scores) {
         System.out.println(getScoreSummary("Player 1", scores.get(0)));
         System.out.println();
         System.out.println(getScoreSummary("Player 2", scores.get(1)));

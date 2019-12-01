@@ -101,16 +101,16 @@ public class FXClientController {
     }
 
     synchronized void processServerMessage(ServerMessage fromServer) {
-        if (fromServer.HEADER == ServerMessage.Headers.WELCOME) {
+        if (fromServer.header == ServerMessage.Headers.WELCOME) {
             playerOne.setText("Player 1");
             playerTwo.setText("Player 2");
-            displayMessage(fromServer.BODY);
-        } else if (fromServer.HEADER == ServerMessage.Headers.WAIT) {
+            displayMessage(fromServer.body);
+        } else if (fromServer.header == ServerMessage.Headers.WAIT) {
             setAnswersDisable(true);
             setCategoryDisable(true);
-            displayMessage(fromServer.BODY);
-        } else if (fromServer.HEADER == ServerMessage.Headers.CHOOSE_CATEGORY) {
-            String[] categories = fromServer.BODY.split(";");
+            displayMessage(fromServer.body);
+        } else if (fromServer.header == ServerMessage.Headers.CHOOSE_CATEGORY) {
+            String[] categories = fromServer.body.split(";");
             /*categoryChooser.getItems().clear();
             for (String s : categories) {
                 categoryChooser.getItems().add(s);
@@ -122,14 +122,14 @@ public class FXClientController {
             }
             displayMessage("Choose category");
             setAnswersDisable(false);
-        } else if (fromServer.HEADER == ServerMessage.Headers.YOU_WIN) {
+        } else if (fromServer.header == ServerMessage.Headers.YOU_WIN) {
             getMessageDialog("You win!", "Congratulations!").showAndWait();
-        } else if (fromServer.HEADER == ServerMessage.Headers.YOU_LOSE) {
+        } else if (fromServer.header == ServerMessage.Headers.YOU_LOSE) {
             getMessageDialog("You lose!", "Too bad!").showAndWait();
-        } else if (fromServer.HEADER == ServerMessage.Headers.YOU_TIED) {
+        } else if (fromServer.header == ServerMessage.Headers.YOU_TIED) {
             getMessageDialog("You tied!", "How unexpected!").showAndWait();
         } else {
-            displayMessage(fromServer.BODY);
+            displayMessage(fromServer.body);
         }
     }
 

@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static violofsson.orange.protocol.ServerMessage.Headers.*;
+
 public interface GenericClientController extends Runnable {
+    void displayCategories(String[] categories);
+
     void displayMessage(ServerMessage message);
 
     void displayString(String s);
@@ -13,10 +17,34 @@ public interface GenericClientController extends Runnable {
 
     void displayCurrentScores(Integer[] scores);
 
-    void displayScoreHistory(ArrayList<List<Integer>> scores);
+    void displayScoreHistory(List<List<Integer>> scores);
 
     ClientConnection getConnection();
 
+    // TODO Låt controllern sköta all logik
+    default void processServerMessage(ServerMessage message) {
+        if (message.header == WELCOME) {
+            displayString(message.body);
+        /*} else if (message.header == WAIT) {
+            displayString(message.body);*/
+        } else if (message.header == CHOOSE_CATEGORY) {
+            displayCategories(ServerMessage.parseCategories(message.body));
+        /*} else if (message.header == QUESTION) {
+
+        } else if (message.header == YOU_WIN
+                || message.header == YOU_LOSE
+                || message.header == YOU_TIED) {*/
+
+        } else if (message.header == CURRENT_SCORE) {
+            displayCurrentScores(ServerMessage.parseCurrentScores(message.body));
+        } else if (message.header == SCORE_HISTORY) {
+            displayScoreHistory(ServerMessage.parseScoreHistory(message.body));
+        } else {
+            displayString(message.body);
+        }
+    }
+
+    @Override
     default void run() {
         Object obj;
         try {
