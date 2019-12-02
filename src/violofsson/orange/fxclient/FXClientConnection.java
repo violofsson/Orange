@@ -7,7 +7,7 @@ import violofsson.orange.protocol.Question;
 import violofsson.orange.protocol.ServerMessage;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 
 class FXClientConnection extends ClientConnection implements GenericClientController {
     private FXClientController controller;
@@ -24,7 +24,7 @@ class FXClientConnection extends ClientConnection implements GenericClientContro
 
     @Override
     public void displayServerMessage(ServerMessage message) {
-        Platform.runLater(() -> controller.displayMessage(message.body));
+        Platform.runLater(() -> controller.displayMessage(message.getString()));
     }
 
     @Override
@@ -43,11 +43,11 @@ class FXClientConnection extends ClientConnection implements GenericClientContro
     }
 
     @Override
-    public void displayScoreHistory(List<List<Integer>> scores) {
-        List<Integer> playerOneHistory = scores.get(0);
-        List<Integer> playerTwoHistory = scores.get(1);
-        System.out.println(playerOneHistory);
-        System.out.println(playerTwoHistory);
+    public void displayScoreHistory(Integer[][] scores) {
+        Integer[] playerOneHistory = scores[0];
+        Integer[] playerTwoHistory = scores[1];
+        System.out.println(Arrays.toString(playerOneHistory));
+        System.out.println(Arrays.toString(playerTwoHistory));
     }
 
     @Override

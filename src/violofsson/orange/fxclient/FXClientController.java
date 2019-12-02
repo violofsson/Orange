@@ -135,11 +135,11 @@ public class FXClientController {
 
     synchronized void showEndMessage(ServerMessage message) {
         Alert dialog;
-        if (message.header == ServerMessage.Headers.YOU_WIN) {
+        if (message.getHeader() == ServerMessage.Headers.YOU_WIN) {
             dialog = getMessageDialog("You win!", "Congratulations!");
-        } else if (message.header == ServerMessage.Headers.YOU_LOSE) {
+        } else if (message.getHeader() == ServerMessage.Headers.YOU_LOSE) {
             dialog = getMessageDialog("You lose!", "Too bad!");
-        } else if (message.header == ServerMessage.Headers.YOU_TIED) {
+        } else if (message.getHeader() == ServerMessage.Headers.YOU_TIED) {
             dialog = getMessageDialog("You tied!", "How unexpected!");
         } else {
             dialog = getMessageDialog("ERROR", "Something went wrong!");

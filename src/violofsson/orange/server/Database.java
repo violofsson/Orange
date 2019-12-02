@@ -28,9 +28,10 @@ class Database {
 
     static class QuestionAPICall {
         List<SerializedQuestion> results;
-        List<Question> getQuestions() {
-            return results.stream().map(SerializedQuestion::toRealQuestion)
-                    .collect(Collectors.toList());
+        Question[] getQuestions() {
+            return results.stream()
+                    .map(SerializedQuestion::toRealQuestion)
+                    .toArray(Question[]::new);
         }
     }
 
@@ -79,8 +80,8 @@ class Database {
         }
     }
 
-    List<Question> getQuestions(String wantedCategory,
-                                int numberOfQuestions) {
+    Question[] getQuestions(String wantedCategory,
+                            int numberOfQuestions) {
         try {
             int categoryId = categoryIDs.getOrDefault(wantedCategory, 9);
             URL questionRequest = new URL(

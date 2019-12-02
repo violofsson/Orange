@@ -1,9 +1,5 @@
 package violofsson.orange.protocol;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import static violofsson.orange.protocol.ServerMessage.Headers.*;
 
 public interface GenericClientController extends Runnable {
@@ -17,7 +13,7 @@ public interface GenericClientController extends Runnable {
 
     void displayCurrentScores(Integer[] scores);
 
-    void displayScoreHistory(List<List<Integer>> scores);
+    void displayScoreHistory(Integer[][] scores);
 
     void displayWinLossTie(ServerMessage message);
 
@@ -28,24 +24,27 @@ public interface GenericClientController extends Runnable {
     void welcomePlayer(String welcomeMessage);
 
     // TODO Låt controllern sköta all logik
-    default void processServerMessage(ServerMessage message) {
-        if (message.header == WELCOME) {
-            welcomePlayer(message.body);
-        } else if (message.header == WAIT) {
-            setWaiting(message.body);
-        } else if (message.header == CHOOSE_CATEGORY) {
-            displayCategories(ServerMessage.decodeStringList(message.body));
-            /*} else if (message.header == QUESTION) {
+    default void processServerMessage(ServerMessage message) throws Exception {
+        if (message.getHeader() == WELCOME) {
+            welcomePlayer(message.getString());
+        } else if (message.getHeader() == WAIT) {
+            setWaiting(message.getString());
+        } else if (message.getHeader() == CHOOSE_CATEGORY) {
+            displayCategories(message.decodeStringArray());
+            // TODO Hantera frågor och korrekta svar som ServerMessages
+            /*} else if (message.getHeader() == QUESTION) {
+
+             ] else if (message.getHeader() == CORRECT_ANSWER) {
 
              */
-        } else if (message.header == YOU_WIN
-                || message.header == YOU_LOSE
-                || message.header == YOU_TIED) {
+        } else if (message.getHeader() == YOU_WIN
+                || message.getHeader() == YOU_LOSE
+                || message.getHeader() == YOU_TIED) {
             displayWinLossTie(message);
-        } else if (message.header == CURRENT_SCORE) {
-            displayCurrentScores(ServerMessage.decodeCurrentScores(message.body));
-        } else if (message.header == SCORE_HISTORY) {
-            displayScoreHistory(ServerMessage.decodeScoreHistory(message.body));
+        } else if (message.getHeader() == CURRENT_SCORE) {
+            displayCurrentScores(message.decodeCurrentScores());
+        } else if (message.getHeader() == SCORE_HISTORY) {
+            displayScoreHistory(message.decodeScoreHistory());
         } else {
             displayServerMessage(message);
         }
@@ -65,15 +64,11 @@ public interface GenericClientController extends Runnable {
                 } else if (obj instanceof String) {
                     String message = (String) obj;
                     displayString(message);
-                } else if (obj instanceof Integer[]) {
-                    Integer[] points = (Integer[]) obj;
-                    displayCurrentScores(points);
-                } else if (obj instanceof ArrayList) {
-                    ArrayList<List<Integer>> lista = (ArrayList<List<Integer>>) obj;
-                    displayScoreHistory(lista);
+                } else {
+                    throw new Exception(obj.toString());
                 }
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

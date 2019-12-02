@@ -10,7 +10,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 
 public class SwingClient extends JFrame implements GenericClientController {
     private ClientConnection connection;
@@ -130,7 +130,7 @@ public class SwingClient extends JFrame implements GenericClientController {
 
     @Override
     public void displayServerMessage(ServerMessage message) {
-        displayString(message.body);
+        displayString(message.getString());
     }
 
     @Override
@@ -153,19 +153,19 @@ public class SwingClient extends JFrame implements GenericClientController {
     }
 
     @Override
-    public void displayScoreHistory(List<List<Integer>> scores) {
-        System.out.println(getScoreSummary("Player 1", scores.get(0)));
+    public void displayScoreHistory(Integer[][] scores) {
+        System.out.println(getScoreSummary("Player 1", Arrays.asList(scores[0])));
         System.out.println();
-        System.out.println(getScoreSummary("Player 2", scores.get(1)));
+        System.out.println(getScoreSummary("Player 2", Arrays.asList(scores[1])));
     }
 
     @Override
     public void displayWinLossTie(ServerMessage message) {
-        if (message.header == ServerMessage.Headers.YOU_WIN) {
+        if (message.getHeader() == ServerMessage.Headers.YOU_WIN) {
             showMessageDialog("You win!", "Congratulations!");
-        } else if (message.header == ServerMessage.Headers.YOU_LOSE) {
+        } else if (message.getHeader() == ServerMessage.Headers.YOU_LOSE) {
             showMessageDialog("You lose!", "Too bad!");
-        } else if (message.header == ServerMessage.Headers.YOU_TIED) {
+        } else if (message.getHeader() == ServerMessage.Headers.YOU_TIED) {
             showMessageDialog("You tied!", "How unexpected!");
         }
         // Vad göra om annat meddelande?

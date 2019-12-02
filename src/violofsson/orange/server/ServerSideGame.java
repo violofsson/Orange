@@ -4,7 +4,8 @@ import violofsson.orange.protocol.Question;
 import violofsson.orange.protocol.ServerMessage;
 
 import java.io.IOException;
-import java.util.List;
+
+import static violofsson.orange.protocol.ServerMessage.*;
 
 public class ServerSideGame extends Thread {
     private enum States {
@@ -16,7 +17,7 @@ public class ServerSideGame extends Thread {
 
     private Database db = new Database();
     private ServerSidePlayer playerOne, playerTwo, currentPlayer;
-    private List<Question> questions;
+    private Question[] questions;
     private int questionsPerRound, totalRounds;
     private int currentRound = 0;
     private States currentState = States.SELECTING_CATEGORY;
@@ -31,13 +32,11 @@ public class ServerSideGame extends Thread {
         try {
             while (true) {
                 if (currentState == States.SELECTING_CATEGORY) {
-                    currentOpponent().sendMessage(
-                            ServerMessage.Headers.WAIT,
+                    currentOpponent().sendMessage(Headers.WAIT,
                             "Wait until other player chooses a category!");
                     selectNewCategory();
                     currentState = States.ASKING_QUESTIONS;
-                    currentOpponent().sendMessage(
-                            ServerMessage.Headers.WAIT,
+                    currentOpponent().sendMessage(Headers.WAIT,
                             "Wait until other player answer");
                 } else if (currentState == States.ASKING_QUESTIONS) {
                     handleQuestions();
@@ -48,6 +47,7 @@ public class ServerSideGame extends Thread {
                     sendScore();
                     sendScoreHistory();
                     hasWinner();
+                    // TODO Avsluta spel i stället för att starta om?
                     resetGame();
                 }
             }
@@ -70,7 +70,7 @@ public class ServerSideGame extends Thread {
         Question q;
         int tempScore = 0;
         while (!allQuestionsAnswered()) {
-            q = questions.get(currentPlayer.questionNumber);
+            q = questions[currentPlayer.questionNumber];
             currentPlayer.sendQuestion(q);
             String answer = currentPlayer.readLine();
 
@@ -86,20 +86,14 @@ public class ServerSideGame extends Thread {
     private synchronized void hasWinner() throws IOException {
         if (isGameOver()) {
             if (playerOne.totPoints > playerTwo.totPoints) {
-                playerOne.sendMessage(
-                        ServerMessage.Headers.YOU_WIN, "YOU WIN");
-                playerTwo.sendMessage(
-                        ServerMessage.Headers.YOU_LOSE, "YOU LOSE");
+                playerOne.sendMessage(Headers.YOU_WIN, "YOU WIN");
+                playerTwo.sendMessage(Headers.YOU_LOSE, "YOU LOSE");
             } else if (playerOne.totPoints < playerTwo.totPoints) {
-                playerOne.sendMessage(
-                        ServerMessage.Headers.YOU_LOSE, "YOU LOSE");
-                playerTwo.sendMessage(
-                        ServerMessage.Headers.YOU_WIN, "YOU WIN");
+                playerOne.sendMessage(Headers.YOU_LOSE, "YOU LOSE");
+                playerTwo.sendMessage(Headers.YOU_WIN, "YOU WIN");
             } else {
-                playerOne.sendMessage(
-                        ServerMessage.Headers.YOU_TIED, "YOU TIED");
-                playerTwo.sendMessage(
-                        ServerMessage.Headers.YOU_TIED, "YOU TIED");
+                playerOne.sendMessage(Headers.YOU_TIED, "YOU TIED");
+                playerTwo.sendMessage(Headers.YOU_TIED, "YOU TIED");
             }
         }
     }
@@ -133,30 +127,28 @@ public class ServerSideGame extends Thread {
     }
 
     private synchronized void selectNewCategory() throws IOException {
-        currentPlayer.sendMessage(ServerMessage.Headers.CHOOSE_CATEGORY,
-                ServerMessage.encodeStringList(db.getRandomCategories(4)));
+        currentPlayer.sendArray(Headers.CHOOSE_CATEGORY,
+                db.getRandomCategories(4).toArray(new String[4]));
         String selectedCategory = currentPlayer.readLine();
         questions = db.getQuestions(selectedCategory, questionsPerRound);
         currentRound++;
     }
 
     private synchronized void sendScore() throws IOException {
-        ServerMessage msg = new ServerMessage(
-                ServerMessage.Headers.CURRENT_SCORE,
-                ServerMessage.encodeCurrentScores(
-                        playerOne.totPoints, playerTwo.totPoints));
+        ServerMessage msg = new ServerMessage(Headers.CURRENT_SCORE,
+                new Integer[]{playerOne.totPoints, playerTwo.totPoints});
         playerOne.sendMessage(msg);
         playerTwo.sendMessage(msg);
         currentState = States.SELECTING_CATEGORY;
     }
 
     private synchronized void sendScoreHistory() throws IOException {
-        ServerMessage msg = new ServerMessage(
-                ServerMessage.Headers.SCORE_HISTORY,
-                ServerMessage.encodeScoreHistories(
-                        playerOne.scoreHistory, playerTwo.scoreHistory));
-        playerOne.sendMessage(msg);
-        playerTwo.sendMessage(msg);
+        Integer[][] scoreHistories = {
+                playerOne.scoreHistory.toArray(new Integer[0]),
+                playerTwo.scoreHistory.toArray(new Integer[0])
+        };
+        playerOne.sendArray(Headers.SCORE_HISTORY, scoreHistories);
+        playerTwo.sendArray(Headers.SCORE_HISTORY, scoreHistories);
     }
 
     void setPlayers(ServerSidePlayer playerOne, ServerSidePlayer playerTwo) {
@@ -169,7 +161,7 @@ public class ServerSideGame extends Thread {
         if (isRoundOver()) {
             currentState = States.ALL_QUESTIONS_ANSWERED;
         } else {
-            currentPlayer.sendMessage(ServerMessage.Headers.WAIT,
+            currentPlayer.sendMessage(Headers.WAIT,
                     "Wait for the opponent");
             currentPlayer = currentOpponent();
             currentState = States.ASKING_QUESTIONS;

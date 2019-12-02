@@ -40,8 +40,11 @@ class ServerSidePlayer {
     }
 
     void sendMessage(ServerMessage.Headers header, String message) throws IOException {
-        outputObject.reset();
-        outputObject.writeObject(new ServerMessage(header, message));
+        sendMessage(new ServerMessage(header, message));
+    }
+
+    <T extends Serializable> void sendArray(ServerMessage.Headers header, T[] array) throws IOException {
+        sendMessage(new ServerMessage(header, array));
     }
 
     void sendQuestion(Question q) throws IOException {

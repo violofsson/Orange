@@ -1,11 +1,6 @@
 package violofsson.orange.protocol;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ServerMessage implements Serializable {
     public enum Headers {
@@ -13,6 +8,7 @@ public class ServerMessage implements Serializable {
         WAIT,
         CHOOSE_CATEGORY,
         QUESTION,
+        CORRECT_ANSWER,
         YOU_WIN,
         YOU_LOSE,
         YOU_TIED,
@@ -21,49 +17,53 @@ public class ServerMessage implements Serializable {
         UNDEFINED
     }
 
-    public final Headers header;
-    public final String body;
-    static final String DELIMITER=";";
+    private final Headers header;
+    private Serializable embeddedObject;
 
     public ServerMessage(Headers header, String body) {
         this.header = header;
-        this.body = body;
+        this.embeddedObject = body;
     }
 
-    public static Integer[] decodeCurrentScores(String s) {
-        String[] array = s.split(DELIMITER);
-        Integer[] scores = new Integer[array.length];
-        for (int i = 0; i < array.length; i++) {
-            scores[i] = Integer.parseInt(array[i]);
+    public ServerMessage(Headers header, Serializable embeddedObject) {
+        this.header = header;
+        this.embeddedObject = embeddedObject;
+    }
+
+    public Integer[] decodeCurrentScores() throws Exception {
+        if (this.header == Headers.CURRENT_SCORE
+                && embeddedObject instanceof Integer[]) {
+            return (Integer[]) embeddedObject;
+        } else {
+            throw new Exception();
         }
-        return scores;
     }
 
-    public static List<List<Integer>> decodeScoreHistory(String s) {
-        List<Integer> integers = Arrays.stream(s.split(DELIMITER))
-                .mapToInt(Integer::parseInt).boxed()
-                .collect(Collectors.toList());
-        List<List<Integer>> result = new ArrayList<>();
-        result.add(integers.subList(0, integers.size()/2));
-        result.add(integers.subList(integers.size()/2, integers.size()));
-        return result;
+    public Integer[][] decodeScoreHistory() throws Exception {
+        if (this.header == Headers.SCORE_HISTORY
+                && embeddedObject instanceof Integer[][]) {
+            return (Integer[][]) embeddedObject;
+        } else {
+            throw new Exception();
+        }
     }
 
-    public static String[] decodeStringList(String s) {
-        return s.split(DELIMITER);
+    public String[] decodeStringArray() throws Exception {
+        if (embeddedObject instanceof String[]) {
+            return (String[]) embeddedObject;
+        } else if (embeddedObject instanceof String) {
+            return new String[]{(String) embeddedObject};
+        } else {
+            throw new Exception();
+        }
     }
 
-    public static String encodeCurrentScores(int playerOne, int playerTwo) {
-        return playerOne + DELIMITER + playerTwo;
+    public Headers getHeader() {
+        return this.header;
     }
 
-    public static String encodeScoreHistories(List<Integer> playerOne, List<Integer> playerTwo) {
-        return Stream.concat(playerOne.stream(), playerTwo.stream())
-                .map(Object::toString)
-                .collect(Collectors.joining(ServerMessage.DELIMITER));
-    }
-
-    public static String encodeStringList(List<String> list) {
-        return String.join(DELIMITER, list);
+    public String getString() {
+        // Fel om icke-sträng lagrats?
+        return embeddedObject.toString();
     }
 }
