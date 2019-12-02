@@ -30,6 +30,7 @@ public class ServerMessage implements Serializable {
         this.embeddedObject = embeddedObject;
     }
 
+    // TODO Ersätt generisk Exception med riktigt felmeddelande
     public Integer[] decodeCurrentScores() throws Exception {
         if (this.header == Headers.CURRENT_SCORE
                 && embeddedObject instanceof Integer[]) {
