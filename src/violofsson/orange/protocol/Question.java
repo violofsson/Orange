@@ -19,8 +19,8 @@ public class Question implements Serializable {
         Collections.shuffle(alternatives);
     }
 
-    public List<String> getAlternatives() {
-        return alternatives;
+    public String[] getAlternatives() {
+        return alternatives.toArray(new String[0]);
     }
 
     public String getQuestion() {

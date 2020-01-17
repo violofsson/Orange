@@ -10,61 +10,36 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class SwingClient extends JFrame implements GenericClientController {
     private ClientConnection connection;
-    private JComboBox<String> categoryChooser;
-    private JPanel categoryPanel = new JPanel();
-    private JTextArea messageArea = new JTextArea();
+    private String userAnswer;
+    //private Function<String, Boolean> checkAnswer;
 
-    private JButton categoryButton = new JButton("Start Game");
+    private JTextArea messageArea = new JTextArea();
     private JButton continueButton = new JButton("Continue");
     private JButton[] buttons = new JButton[4];
     private JLabel playerOne = new JLabel("s1");
     private JLabel playerTwo = new JLabel("s2");
-    private JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
 
-    private String userAnswer;
-    //private Function<String, Boolean> checkAnswer;
-    private ActionListener continueButtonListener = e -> {
-        disableContinue(true);
-        for (JButton button : buttons) {
-            button.setBackground(Color.BLACK);
-        }
-        getConnection().send(userAnswer);
-    };
     public SwingClient() throws IOException {
         connection = new ClientConnection();
-
-        // TODO Rensa upp... allt
-        String[] colors = {"Candy", "Egg", "Famous", "Random"};
-        categoryChooser = new JComboBox<>(colors);
-        categoryChooser.setSelectedIndex(0);
-
-        categoryButton.addActionListener(e -> {
-            getConnection().send(categoryChooser.getSelectedItem());
-            categoryChooser.setEnabled(false);
-            categoryButton.setEnabled(false);
-        });
-
-        categoryPanel.add(categoryChooser);
-        categoryPanel.add(categoryButton);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(messageArea, BorderLayout.CENTER);
 
+        ActionListener alternativesListener = e -> {
+            JButton temp = (JButton) e.getSource();
+            userAnswer = temp.getText();
+            disableAnswers(true);
+            //changeButtonColors(userAnswer);
+            disableContinue(false);
+        };
+
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 2));
         for (int i = 0; i < buttons.length; i++) {
             String[] strings = {"Allan", "Fazli Zekiqi", "Victor J", "Victor O"};
             buttons[i] = new JButton(strings[i]);
-            ActionListener alternativesListener = e -> {
-                JButton temp = (JButton) e.getSource();
-                userAnswer = temp.getText();
-                disableCategories(true);
-                disableAnswers(true);
-                //changeButtonColors(userAnswer);
-                disableContinue(false);
-            };
             buttons[i].addActionListener(alternativesListener);
             buttons[i].setEnabled(false);
             buttons[i].setBackground(Color.BLACK);
@@ -93,16 +68,20 @@ public class SwingClient extends JFrame implements GenericClientController {
         messageArea.setDisabledTextColor(Color.BLACK);
         messageArea.setBackground(Color.ORANGE);
         messageArea.setForeground(Color.BLACK);
-
         messageArea.setFont(messageArea.getFont().deriveFont(15.0f));
 
-        categoryPanel.setBackground(Color.ORANGE);
         buttonPanel.setBackground(Color.ORANGE);
         centerPanel.setBackground(Color.ORANGE);
 
         setLayout(new BorderLayout());
         add(centerPanel, BorderLayout.CENTER);
-        add(categoryPanel, BorderLayout.NORTH);
+        ActionListener continueButtonListener = e -> {
+            disableContinue(true);
+            for (JButton button : buttons) {
+                button.setBackground(Color.BLACK);
+            }
+            getConnection().send(userAnswer);
+        };
         continueButton.addActionListener(continueButtonListener);
         add(continueButton, BorderLayout.SOUTH);
 
@@ -115,9 +94,8 @@ public class SwingClient extends JFrame implements GenericClientController {
 
     @Override
     public void displayCategories(String[] categories) {
-        for (int i = 0; i < categories.length && i < buttonPanel.getComponents().length; i++) {
-            JButton btn = (JButton) buttonPanel.getComponents()[i];
-            btn.setText(categories[i]);
+        for (int i = 0; i < buttons.length && i < categories.length; i++) {
+            buttons[i].setText(categories[i]);
         }
         displayString("Choose category");
         disableAnswers(false);
@@ -136,13 +114,11 @@ public class SwingClient extends JFrame implements GenericClientController {
     @Override
     public void displayQuestion(Question q) {
         displayString(q.getQuestion());
-        java.util.List<String> alt = q.getAlternatives();
+        String[] alt = q.getAlternatives();
         //checkAnswer = (q::isRightAnswer);
-        for (Component c : buttonPanel.getComponents()) {
-            c.setEnabled(true);
-        }
-        for (int i = 0; i < alt.size(); i++) {
-            buttons[i].setText(alt.get(i));
+        for (int i = 0; i < buttons.length && i < alt.length; i++) {
+            buttons[i].setText(alt[i]);
+            buttons[i].setEnabled(true);
         }
     }
 
@@ -154,9 +130,9 @@ public class SwingClient extends JFrame implements GenericClientController {
 
     @Override
     public void displayScoreHistory(Integer[][] scores) {
-        System.out.println(getScoreSummary("Player 1", Arrays.asList(scores[0])));
+        System.out.println(getScoreSummary("Player 1", scores[0]));
         System.out.println();
-        System.out.println(getScoreSummary("Player 2", Arrays.asList(scores[1])));
+        System.out.println(getScoreSummary("Player 2", scores[1]));
     }
 
     @Override
@@ -179,7 +155,6 @@ public class SwingClient extends JFrame implements GenericClientController {
     @Override
     public void setWaiting(String waitMessage) {
         disableAnswers(true);
-        disableCategories(true);
         displayString(waitMessage);
     }
 
@@ -204,14 +179,8 @@ public class SwingClient extends JFrame implements GenericClientController {
     }*/
 
     void disableAnswers(boolean b) {
-        for (Component c : buttonPanel.getComponents()) {
-            c.setEnabled(!b);
-        }
-    }
-
-    void disableCategories(boolean b) {
-        for (Component c : categoryPanel.getComponents()) {
-            c.setEnabled(!b);
+        for (JButton btn  : buttons) {
+            btn.setEnabled(!b);
         }
     }
 
@@ -220,12 +189,12 @@ public class SwingClient extends JFrame implements GenericClientController {
         continueButton.setVisible(!b);
     }
 
-    private String getScoreSummary(String playerName, java.util.List<Integer> scores) {
+    private String getScoreSummary(String playerName, Integer[] scores) {
         StringBuilder s = new StringBuilder(playerName + ":");
         int sum = 0;
-        for (int i = 0; i < scores.size(); i++) {
-            sum += scores.get(i);
-            s.append(String.format("\nRond %d: %d", i + 1, scores.get(i)));
+        for (int i = 0; i < scores.length; i++) {
+            sum += scores[i];
+            s.append(String.format("\nRond %d: %d", i + 1, scores[i]));
         }
         s.append("\nSumma: ").append(sum);
         return s.toString();

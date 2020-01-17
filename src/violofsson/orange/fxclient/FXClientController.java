@@ -1,6 +1,5 @@
 package violofsson.orange.fxclient;
 
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -14,7 +13,6 @@ import violofsson.orange.protocol.Question;
 import violofsson.orange.protocol.ServerMessage;
 
 import java.io.IOException;
-import java.util.List;
 
 public class FXClientController {
     @FXML
@@ -60,15 +58,7 @@ public class FXClientController {
     @FXML
     public void initialize() throws IOException {
         connection = new FXClientConnection(this);
-        // TODO Ta reda på hur det här ens fungerar
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                connection.run();
-                return null;
-            }
-        };
-        Thread t = new Thread(task);
+        Thread t = new Thread(connection);
         t.setDaemon(true);
         t.start();
     }
@@ -84,10 +74,10 @@ public class FXClientController {
 
     synchronized void displayQuestion(Question q) {
         displayMessage(q.getQuestion());
-        List<String> alternatives = q.getAlternatives();
+        String[] alternatives = q.getAlternatives();
         for (int i = 0; i < buttonPanel.getChildren().size(); i++) {
             Button b = (Button) buttonPanel.getChildren().get(i);
-            b.setText(alternatives.get(i));
+            b.setText(alternatives[i]);
         }
         setAnswersDisable(false);
     }
